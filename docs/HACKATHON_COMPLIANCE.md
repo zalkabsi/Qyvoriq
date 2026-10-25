@@ -9,7 +9,7 @@ Checked against the live Devpost pages on 2026-10-25. This checklist records imp
 | Substantive OpenCV 5 image analysis | `backend/vision/` uses OpenCV decoding, blur/exposure/glare measurements, Canny/Hough and contour dial localization, `warpPolar`, CLAHE refinement, and annotation. `/api/health/ready` checks the imported major version. The tested runtime was OpenCV 5.0.0. | `VERIFIED COMPLETE` locally |
 | Meaningful AWS component | `deploy/` contains a private-ECR, ARM64 ECS/Fargate deployment design that runs the API and vision code. No AWS identity, secret, or CLI is configured in this environment; no stack was deployed and no endpoint exists. | `BLOCKED` |
 | Technical report | `docs/TECHNICAL_REPORT.md` describes implemented behavior and the disjoint 120-image synthetic test results. | `VERIFIED COMPLETE` locally; synthetic-only evidence |
-| Judge-accessible code | The intended repository `zalkabsi/Qyvoriq` exists, is public, and is empty at inspection time. Authenticated push permission is available. | `IMPLEMENTED BUT NOT VERIFIED` until the source is pushed and checked |
+| Judge-accessible code | The public repository `zalkabsi/Qyvoriq` is populated on `main`; the remote tree was checked against all 72 source, documentation, test, and fixture files. | `VERIFIED COMPLETE` |
 | Reproducible setup and pinned dependencies | `requirements.txt`, `requirements-dev.txt`, `frontend/package-lock.json`, Dockerfile, test instructions, CI workflow, passing Python/Node dependency audits. | `VERIFIED COMPLETE` locally after build and tests |
 | Architecture diagram | `docs/ARCHITECTURE.md` and README Mermaid diagram. AWS panel is explicitly planned, not deployed. | `VERIFIED COMPLETE` as an accurate design diagram |
 | Working endpoint or arranged live demo | Local FastAPI and Vite interface are implemented and smoke-tested. No public endpoint or human-arranged screen share exists. | `IMPLEMENTED BUT NOT VERIFIED` for judging |
@@ -45,7 +45,7 @@ Before submitting, the project owner must:
 1. Confirm the live deadline, submission fields, team representation, and eligibility in Devpost.
 2. Provide AWS access or arrange a live demo if the cloud requirement is to be completed.
 3. Record and publish an unlisted/public video under five minutes that includes the team, working app, architecture, and measured results.
-4. Push and independently open the public GitHub repository, then add the link in Devpost.
+4. Add the verified public GitHub repository link in Devpost.
 5. Enter the project and upload the report/video through the authenticated Devpost submission flow.
 
 ## Sources

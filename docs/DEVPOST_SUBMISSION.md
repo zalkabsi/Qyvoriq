@@ -43,7 +43,7 @@ Evaluate on SyncG with its published held-out split, add licensed real captures 
 
 ## Links to supply
 
-- Public source repository: `https://github.com/zalkabsi/Qyvoriq` (verify the push and public access before submission).
+- Public source repository: `https://github.com/zalkabsi/Qyvoriq` (public access and the `main` tree have been verified).
 - Working AWS endpoint or arranged live screen-share: **not available yet**.
 - Public or unlisted demo video (maximum five minutes): **not recorded yet**.
 - Technical report: `docs/TECHNICAL_REPORT.md`.
