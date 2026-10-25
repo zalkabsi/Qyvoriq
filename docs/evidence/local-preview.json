@@ -1,0 +1,60 @@
+{
+  "preview": true,
+  "team": "Zein Alkabsi",
+  "voice": "en-US-EmmaMultilingualNeural",
+  "speech_service": "speech.platform.bing.com",
+  "health": {
+    "status": "ready",
+    "opencv_version": "5.0.0",
+    "opencv_major": "5",
+    "architecture": "x86_64",
+    "revision": "development"
+  },
+  "duration_seconds": 243.2,
+  "browser_checks": [
+    {
+      "state": "VERIFIED",
+      "attempt": 1,
+      "reading": 63.24795
+    },
+    {
+      "state": "REINSPECTION_REQUIRED",
+      "attempt": 1,
+      "reading": null
+    },
+    {
+      "state": "VERIFIED",
+      "attempt": 2,
+      "reading": 63.24795
+    },
+    {
+      "state": "REINSPECTION_REQUIRED",
+      "attempt": 1,
+      "reading": null
+    },
+    {
+      "state": "REINSPECTION_REQUIRED",
+      "attempt": 2,
+      "reading": null
+    },
+    {
+      "state": "HUMAN_REVIEW_REQUIRED",
+      "attempt": 3,
+      "reading": null
+    },
+    {
+      "state": "UNSUPPORTED_INSTRUMENT",
+      "attempt": 1,
+      "reading": null
+    }
+  ],
+  "scope": "Local preview from a working tree, with no AWS deployment claim. The final immutable AWS source revision and public/unlisted video are pending.",
+  "format": {
+    "video": "H.264",
+    "audio": "AAC",
+    "width": 1600,
+    "height": 1000,
+    "captions": "burned-in English"
+  },
+  "hosting_status": "not published; preview MP4 delivered in the Codex workspace"
+}

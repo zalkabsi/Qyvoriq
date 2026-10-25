@@ -9,6 +9,7 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 
 
 MAX_PIXELS = 16_000_000
+MAX_WORKING_EDGE = 1600
 ALLOWED_FORMATS = {"JPEG", "PNG", "WEBP"}
 
 
@@ -40,6 +41,10 @@ def decode_image(data: bytes) -> DecodedImage:
             orientation = opened.getexif().get(274)
             corrected = orientation not in (None, 1)
             oriented = ImageOps.exif_transpose(opened).convert("RGB")
+            oriented.thumbnail((MAX_WORKING_EDGE, MAX_WORKING_EDGE), Image.Resampling.LANCZOS)
+            width, height = oriented.size
+            if min(width, height) < 160:
+                raise InvalidImage("The image is too narrow after normalization; include the complete dial in a less elongated frame.")
             rgb = np.asarray(oriented)
     except InvalidImage:
         raise

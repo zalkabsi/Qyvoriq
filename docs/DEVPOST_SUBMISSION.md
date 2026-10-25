@@ -35,7 +35,7 @@ Two estimates can share the same bad input or wrong dial geometry, so agreement 
 
 ## What is incomplete
 
-No AWS endpoint has been deployed in this workspace; no AWS credentials or identity were configured. The application currently uses standard OpenCV 5 wheels and does not claim COOL. No real-gauge benchmark or field test was run. The five-minute video has not been recorded. These requirements must be completed or accurately presented as incomplete before submission.
+No AWS endpoint is deployed yet; a dedicated GitHub OIDC access bootstrap and ECS Express Mode deployment workflow are prepared and awaiting the account owner's role. Standard OpenCV 5 is used and COOL is not claimed. No real-gauge benchmark or field test was run. A narrated browser-recording pipeline is available; the final live AWS video and its public/unlisted link are still pending. These statuses must be updated from actual deployment and recording evidence before submission.
 
 ## Future work
 

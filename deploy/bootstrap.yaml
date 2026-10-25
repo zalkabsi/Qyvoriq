@@ -112,7 +112,7 @@ Resources:
             Statement:
               - Sid: ProjectCloudFormation
                 Effect: Allow
-                Action: [cloudformation:CreateStack, cloudformation:UpdateStack, cloudformation:DeleteStack, cloudformation:DescribeStacks, cloudformation:DescribeStackEvents, cloudformation:DescribeStackResources, cloudformation:ListStackResources, cloudformation:GetTemplate, cloudformation:CreateChangeSet, cloudformation:DescribeChangeSet, cloudformation:ExecuteChangeSet, cloudformation:DeleteChangeSet]
+                Action: [cloudformation:CreateStack, cloudformation:UpdateStack, cloudformation:DeleteStack, cloudformation:DescribeStacks, cloudformation:DescribeStackEvents, cloudformation:DescribeStackResources, cloudformation:ListStackResources, cloudformation:GetTemplate, cloudformation:CreateChangeSet, cloudformation:DescribeChangeSet, cloudformation:ExecuteChangeSet, cloudformation:DeleteChangeSet, cloudformation:TagResource, cloudformation:UntagResource]
                 Resource: !Sub arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/qyvoriq-demo/*
               - Sid: ReadBootstrapOutputs
                 Effect: Allow
@@ -154,7 +154,7 @@ Resources:
                 Resource: '*'
               - Sid: PushProjectImages
                 Effect: Allow
-                Action: [ecr:BatchCheckLayerAvailability, ecr:InitiateLayerUpload, ecr:UploadLayerPart, ecr:CompleteLayerUpload, ecr:PutImage, ecr:DescribeImages, ecr:BatchGetImage]
+                Action: [ecr:BatchCheckLayerAvailability, ecr:InitiateLayerUpload, ecr:UploadLayerPart, ecr:CompleteLayerUpload, ecr:PutImage, ecr:DescribeImages, ecr:DescribeImageScanFindings, ecr:BatchGetImage]
                 Resource: !GetAtt Repository.Arn
               - Sid: DemoTestToken
                 Effect: Allow

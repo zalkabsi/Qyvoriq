@@ -2,5 +2,6 @@
   "enabled": false,
   "region": "us-west-2",
   "role_arn": "",
+  "team": "Zein Alkabsi",
   "bootstrap_stack": "qyvoriq-access"
 }

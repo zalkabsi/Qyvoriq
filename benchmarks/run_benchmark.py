@@ -47,6 +47,13 @@ def summarize(errors: list[float], sample_count: int, elapsed_ms: list[float]) -
             "accuracy_within_5pct_fs": round(sum(error <= 5.0 for error in abs_errors) / len(abs_errors), 4),
             "false_accept_rate_over_5pct_fs": round(sum(error > 5.0 for error in abs_errors) / len(abs_errors), 4),
         }
+        count = sum(error > 5.0 for error in abs_errors)
+        n, z = len(abs_errors), 1.9599639845
+        proportion = count / n
+        center = (proportion + z * z / (2 * n)) / (1 + z * z / n)
+        half = z * float(np.sqrt(proportion * (1 - proportion) / n + z * z / (4 * n * n))) / (1 + z * z / n)
+        result['false_accept_count_over_5pct_fs'] = count
+        result['false_accept_wilson95_interval'] = [round(max(0, center - half), 6), round(min(1, center + half), 6)]
     else:
         result = {"predicted_count": 0, "coverage": 0.0, "mae_fs_pct": None, "median_abs_error_fs_pct": None, "p95_abs_error_fs_pct": None, "accuracy_within_1pct_fs": None, "accuracy_within_2pct_fs": None, "accuracy_within_5pct_fs": None, "false_accept_rate_over_5pct_fs": None}
     result["mean_latency_ms"] = round(statistics.mean(elapsed_ms), 3) if elapsed_ms else None
@@ -171,7 +178,7 @@ def main() -> None:
         summary.setdefault(name, summarize([], sample_count, method_latencies[name]))
 
     risk_curve: list[dict[str, float | int | None]] = []
-    for threshold in (1.0, 2.0, MAX_DISAGREEMENT_PCT_FS, 5.0, 7.5, 10.0, 100.0):
+    for threshold in sorted({1.0, 2.0, MAX_DISAGREEMENT_PCT_FS, 5.0, 7.5, 10.0, 100.0}):
         accepted = [row for row in raw_pairs if row["quality_usable"] and row["in_range"] and row["disagreement"] <= threshold]
         errors = [abs(((row["geom"] + row["polar"]) / 2.0 - row["truth"]) / CALIBRATION.full_scale * 100.0) for row in accepted]
         risk_curve.append({

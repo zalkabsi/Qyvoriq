@@ -6,19 +6,20 @@ Checked against the live Devpost pages on 2026-10-25. This checklist records imp
 
 | Requirement | Current evidence | Status |
 | --- | --- | --- |
-| Substantive OpenCV 5 image analysis | `backend/vision/` uses OpenCV decoding, blur/exposure/glare measurements, Canny/Hough and contour dial localization, `warpPolar`, CLAHE refinement, and annotation. `/api/health/ready` checks the imported major version. The tested runtime was OpenCV 5.0.0. | `VERIFIED COMPLETE` locally |
-| Meaningful AWS component | `deploy/` contains a private-ECR, ARM64 ECS/Fargate deployment design that runs the API and vision code. No AWS identity, secret, or CLI is configured here; the available Docker builder is amd64-only, so no ARM64 image was built, stack deployed, or endpoint created. | `BLOCKED` |
-| Technical report | `docs/TECHNICAL_REPORT.md` describes implemented behavior and the disjoint 120-image synthetic test results. | `VERIFIED COMPLETE` locally; synthetic-only evidence |
-| Judge-accessible code | The public repository `zalkabsi/Qyvoriq` is populated on `main`; the remote tree was checked against all 72 source, documentation, test, and fixture files. | `VERIFIED COMPLETE` |
+| Substantive OpenCV 5 image analysis | `backend/vision/` uses OpenCV color conversion, blur/exposure/glare measurements, Canny/Hough and contour dial localization, `warpPolar`, CLAHE refinement, and annotation. Pillow handles decoding and EXIF. `/api/health/ready` checks the imported major version; the tested runtime was 5.0.0. | `VERIFIED COMPLETE` locally |
+| Meaningful AWS component | The judge-demo path uses ECS Express Mode/Fargate x86, private ECR, generated Secrets Manager token and seven-day application logs. GitHub OIDC identity was actually checked; the access bootstrap is ready. No AWS role has been supplied and no workload is deployed yet. | `BLOCKED` on account access |
+| Technical report | `docs/TECHNICAL_REPORT.md` describes implemented behavior, the 120-image test and 30 paired synthetic observations. Actual AWS URL/digest/revision and final video evidence remain to be added. | Locally reviewed; final cloud evidence pending |
+| Judge-accessible code | The public repository `zalkabsi/Qyvoriq` is populated on `main`; source, documentation, tests and fixtures are published through the connected integration. | `VERIFIED COMPLETE` |
 | Reproducible setup and pinned dependencies | `requirements.txt`, `requirements-dev.txt`, `frontend/package-lock.json`, Dockerfile, test instructions, CI workflow, passing Python/Node dependency audits. | `VERIFIED COMPLETE` locally after build and tests |
-| Architecture diagram | `docs/ARCHITECTURE.md` and README Mermaid diagram. AWS panel is explicitly planned, not deployed. | `VERIFIED COMPLETE` as an accurate design diagram |
+| Architecture diagram | `docs/ARCHITECTURE.md` and README diagrams match the current local loop and planned x86 ECS Express Mode path. | Accurate planned diagram; AWS execution pending |
 | Working endpoint or arranged live demo | Local FastAPI and Vite interface are implemented and smoke-tested. No public endpoint or human-arranged screen share exists. | `IMPLEMENTED BUT NOT VERIFIED` for judging |
-| Five-minute public/unlisted demo video | Script and shot list are in `docs/DEMO_VIDEO_SCRIPT.md`; no recording or public link exists. | `BLOCKED` pending human recording |
-| Evaluation evidence and failure cases | Reproducible synthetic benchmark, test split, captured scenario outputs, and generated examples; no real photographs or SyncG run. | `VERIFIED COMPLETE` locally; synthetic scope only |
+| Five-minute public/unlisted demo video | `scripts/record_demo.py` records real app interactions with Microsoft synthetic narration and captions, credits sole creator Zein Alkabsi, and marks local previews visibly. Final mode requires passing live AWS evidence. | Final AWS recording and accessible hosting pending |
+| Evaluation evidence and failure cases | 120 test images, captured scenarios, and an executed 30-pair controlled follow-up test; no real photographs or SyncG run. | `VERIFIED COMPLETE` locally; synthetic scope only |
 
 ## Rules and timing
 
 - The [rules page](https://opencv26.devpost.com/rules) header lists **October 26, 2026 at 11:45 p.m. PDT**. The [overview](https://opencv26.devpost.com/) body also says **11:59 p.m. Pacific Time**. This project uses 11:45 p.m. PDT, the earlier time.
+- The earlier deadline is **October 27, 2026 at 9:45 a.m. in Riyadh (UTC+3)**.
 - The [overview requirements](https://opencv26.devpost.com/) say every entry must use OpenCV 5 for substantive image/video analysis and run a meaningful component on AWS. A local-only demonstration does not meet the AWS requirement.
 - The overall rubric is technical execution 30%, innovation 20%, impact 20%, UX 10%, documentation/presentation 10%, and cloud/reproducibility/responsible operation 10% ([rules](https://opencv26.devpost.com/rules)).
 - The final submission requirements include a technical report, public or judge-accessible repository/archive, pinned dependencies and build/deploy/test instructions, architecture diagram, working endpoint or arranged live demo, public or unlisted video no longer than five minutes showing the team, app, architecture, and results, plus evaluation evidence and limitations ([overview](https://opencv26.devpost.com/)).
@@ -28,7 +29,7 @@ Checked against the live Devpost pages on 2026-10-25. This checklist records imp
 
 The official focus-path rule requires visual results to change a later plan, tool call, action, or request for human approval; a fixed pipeline with a chatbot explanation is insufficient ([overview, Agentic Vision requirements](https://opencv26.devpost.com/)). Qyvoriq's quality result can skip needle estimators and call `request_new_view`; estimator disagreement triggers contrast refinement, then a new-view request or human escalation. The trace is generated by those executed operations. Automated project behavior is permitted when disclosed by the rules.
 
-Current evidence: a clear synthetic fixture returns `VERIFIED`; a glare fixture logs `assess_image_quality` and `request_new_view` and does not call either needle estimator. Automated trace tests and the paired synthetic same-state fixture are included. This does not establish strong real-world task effectiveness.
+Current evidence: a clear synthetic fixture returns `VERIFIED`; glare skips estimators and calls `request_new_view`; disagreement selects CLAHE refinement; persistent poor evidence escalates. In 30 controlled synthetic pairs, all clean follow-ups were accepted within 2% FS and all persistent-glare cases escalated at the retry limit. These are controlled software results, not field retake success or strong real-world effectiveness.
 
 ## COOL path
 
@@ -43,8 +44,8 @@ The [rules page](https://opencv26.devpost.com/rules) says entrants must be at le
 Before submitting, the project owner must:
 
 1. Confirm the live deadline, submission fields, team representation, and eligibility in Devpost.
-2. Provide AWS access or arrange a live demo if the cloud requirement is to be completed.
-3. Record and publish an unlisted/public video under five minutes that includes the team, working app, architecture, and measured results.
+2. Apply the [dedicated AWS access setup](AWS_ACCESS.md) and supply its non-secret role ARN/region so the meaningful AWS workload can be deployed. An arranged screen share does not waive the AWS-processing requirement.
+3. Review the generated narrated video and sole-creator credit, verify it shows the deployed app, and make the final recording public/unlisted with judge access. The recording pipeline is being prepared by Codex; no fabricated human footage is used.
 4. Add the verified public GitHub repository link in Devpost.
 5. Enter the project and upload the report/video through the authenticated Devpost submission flow.
 

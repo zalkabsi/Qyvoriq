@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "url": "http://127.0.0.1:18889",
+  "checked_at": "2026-10-25T14:53:11+00:00",
+  "health": {
+    "status": "ready",
+    "opencv_version": "5.0.0",
+    "opencv_major": "5",
+    "architecture": "x86_64",
+    "revision": "unknown"
+  },
+  "auth_enforced": true,
+  "scenario_states": {
+    "clear": "VERIFIED",
+    "glare": "REINSPECTION_REQUIRED",
+    "follow_up": "VERIFIED",
+    "contradictory": "REINSPECTION_REQUIRED",
+    "unsupported": "UNSUPPORTED_INSTRUMENT"
+  },
+  "evidence_png_bytes": 74010,
+  "benchmark_samples": 120,
+  "data_scope": "generated synthetic fixtures; not field validation",
+  "container_uid": "10001",
+  "scope": "Actual local production container with ephemeral test token; not AWS deployment evidence.",
+  "browser_checks": {
+    "follow_up_calibration_locked": true,
+    "new_inspection_resets_state": true,
+    "small_scale_reading_not_rounded_to_zero": true
+  }
+}

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -17,12 +18,17 @@ MAX_THRESHOLD_PCT_FS = 5.0
 def main() -> None:
     parser = argparse.ArgumentParser(description="Fit the estimator agreement threshold from a validation-only benchmark output.")
     parser.add_argument("--input", type=Path, required=True)
+    parser.add_argument("--dry-run", action="store_true", help="Report the fitted policy without changing repository artifacts.")
     args = parser.parse_args()
     payload: dict[str, Any] = json.loads(args.input.read_text(encoding="utf-8"))
     if payload.get("split") != "validation":
         parser.error("Calibration accepts only benchmark outputs tagged split=validation.")
     if payload.get("dataset_type") != "synthetic_only":
         parser.error("This implementation only supports explicit synthetic validation data.")
+    calibration = payload.get("calibration", {})
+    full_scale = float(calibration.get("maximum_value", 0)) - float(calibration.get("minimum_value", 0))
+    if not math.isfinite(full_scale) or full_scale <= 0:
+        parser.error("Validation data must declare a finite, positive full-scale span.")
 
     eligible: list[dict[str, Any]] = []
     evaluatable: list[dict[str, Any]] = []
@@ -33,7 +39,7 @@ def main() -> None:
             continue
         if disagreement is None or fixed_mean is None:
             continue
-        error_pct_fs = abs(float(fixed_mean) - float(row["ground_truth"]))
+        error_pct_fs = abs(float(fixed_mean) - float(row["ground_truth"])) / full_scale * 100.0
         candidate = {"disagreement": float(disagreement), "error_pct_fs": error_pct_fs, "seed": row.get("seed")}
         evaluatable.append(candidate)
         if error_pct_fs <= 2.0:
@@ -41,8 +47,8 @@ def main() -> None:
     if len(eligible) < MINIMUM_VALIDATION_SAMPLES:
         parser.error(f"Need at least {MINIMUM_VALIDATION_SAMPLES} usable validation examples; found {len(eligible)}.")
 
-    # Choose the narrowest agreement cap that retains at least 95% of validation
-    # pairs whose fixed-mean reading is within 2% FS. The test split is never read.
+    # Use the higher empirical 95th percentile of eligible validation pairs.
+    # The test split is never read.
     disagreements = np.asarray([item["disagreement"] for item in eligible], dtype=float)
     threshold = float(np.quantile(disagreements, TARGET_RETAINED_COVERAGE, method="higher"))
     threshold = min(MAX_THRESHOLD_PCT_FS, max(0.1, threshold))
@@ -66,8 +72,9 @@ def main() -> None:
     repo = Path(__file__).resolve().parents[1]
     policy_path = repo / "backend" / "agents" / "policy.json"
     result_path = repo / "benchmarks" / "results" / "policy-calibration.json"
-    policy_path.write_text(json.dumps(artifact, indent=2) + "\n", encoding="utf-8")
-    result_path.write_text(json.dumps(artifact, indent=2) + "\n", encoding="utf-8")
+    if not args.dry_run:
+        policy_path.write_text(json.dumps(artifact, indent=2) + "\n", encoding="utf-8")
+        result_path.write_text(json.dumps(artifact, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(artifact, indent=2))
 
 

@@ -8,7 +8,7 @@ Qyvoriq is a small, evidence-first inspection application for calibrated, circul
 
 ## What works
 
-- OpenCV 5 image decoding support, circular dial localization, radial line analysis, and a polar-coordinate needle estimator.
+- OpenCV 5 image quality checks, circular dial localization, radial line analysis, and a polar-coordinate needle estimator.
 - User-entered minimum and maximum values, units, angle endpoints, and sweep direction.
 - A deterministic agent loop where image quality and estimator agreement change the next tool call.
 - Bounded follow-up requests, explicit human escalation, a decision trace, and annotated evidence.
@@ -17,7 +17,7 @@ Qyvoriq is a small, evidence-first inspection application for calibrated, circul
 
 ## Current submission status
 
-The local app, OpenCV 5 checks, and evaluation package are implemented. The AWS endpoint and five-minute submission video are not complete: this environment has no AWS credentials or configured AWS identity, and no human recording is available. See [the compliance checklist](docs/HACKATHON_COMPLIANCE.md) before submitting.
+The local app, OpenCV 5 checks, and evaluation package are implemented. A narrated screen-recording pipeline is available. The final AWS endpoint and public/unlisted judge video are still incomplete until the account owner configures access and the deployed application is recorded. [Connect AWS access](docs/AWS_ACCESS.md) through a dedicated GitHub OIDC role without sharing keys. See [the compliance checklist](docs/HACKATHON_COMPLIANCE.md) and [readiness review](docs/READINESS_REVIEW.md) before submitting.
 
 The live rules require substantive OpenCV 5 use and a meaningful AWS component. The rules header lists **October 26, 2026 at 11:45 p.m. PDT**; the overview body says 11:59 p.m. We use the earlier deadline. [Official rules](https://opencv26.devpost.com/rules) · [Competition overview](https://opencv26.devpost.com/).
 
@@ -37,7 +37,7 @@ flowchart LR
   D -->|uncertain| N[Ask operator for a new view]
   N -->|new image| A
   D -->|retry limit / unsupported| H[Human review]
-  A -. planned ARM64 container .-> AWS[AWS ECS Fargate]
+  A -. planned x86 container .-> AWS[AWS ECS Express Mode / Fargate]
 ```
 
 The two estimators share grayscale input and the localized center/radius, so their failures are correlated. The agent does not treat agreement by itself as proof. It also checks image quality, geometry, calibration range, and a validation-derived disagreement limit. A contrast-normalized reinspection is attempted only after estimator disagreement. The system never moves a camera or controls equipment.
@@ -79,6 +79,7 @@ curl http://127.0.0.1:8000/api/health/ready
 .venv/bin/python -m pytest -q
 .venv/bin/ruff check backend benchmarks examples scripts tests
 .venv/bin/pip-audit -r requirements.txt
+.venv/bin/cfn-lint deploy/*.yaml
 NPM_CONFIG_CACHE=/tmp/qyvoriq-npm-cache npm --prefix frontend run build
 ```
 
@@ -88,6 +89,7 @@ Run a validation split, fit the disagreement threshold from that split, then eva
 PYTHONPATH=. .venv/bin/python -m benchmarks.run_benchmark --split validation --samples 120 --output benchmarks/results/validation.json
 PYTHONPATH=. .venv/bin/python -m benchmarks.calibrate_policy --input benchmarks/results/validation.json
 PYTHONPATH=. .venv/bin/python -m benchmarks.run_benchmark --split test --samples 120 --output benchmarks/results/latest.json
+PYTHONPATH=. .venv/bin/python -m benchmarks.run_reinspection --samples 30
 ```
 
 The benchmark reports error as a percentage of full-scale span, tolerance accuracy, coverage, false acceptance, selective risk, runtime, throughput, and failures by synthetic condition. It is a software-behavior check, not real-world validation. SyncG is not bundled or evaluated here; see [evaluation details](docs/EVALUATION.md).
@@ -118,7 +120,7 @@ Build and smoke-test the container:
 docker run --rm -p 8080:8080 -e QYVORIQ_ENV=development qyvoriq:local
 ```
 
-The AWS artifacts use a private ECR repository and an ARM64 Fargate service behind an HTTPS Application Load Balancer. The deployment expects an existing VPC, public subnets, an ACM certificate, and a token in Secrets Manager. A one-task service keeps the current in-memory inspection workflow intact but is not horizontally scalable or durable. The service runs standard OpenCV 5 wheels; **it does not use COOL**.
+The judge-demo path uses a private ECR image and one x86 ECS Express Mode/Fargate task behind managed HTTPS. Its access bootstrap creates a Secrets Manager token and seven-day application logs; the account needs a default VPC with public subnets. The [AWS access guide](docs/AWS_ACCESS.md) supplies the exact owner setup, then the GitHub workflow can deploy and save live HTTP-check evidence. One steady-state task supports the current in-memory workflow; replacement can lose sessions. A separate advanced ARM64 template remains available. Standard OpenCV 5 is used; **COOL is not claimed**.
 
 See [AWS deployment instructions](deploy/README.md). No AWS resources were provisioned for this workspace. Do not submit a fabricated endpoint as evidence.
 

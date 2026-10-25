@@ -1,4 +1,5 @@
 from backend.agents.orchestrator import InspectionAgent
+from backend.schemas import GaugeCalibration
 from examples.synthetic import make_gauge
 from pathlib import Path
 
@@ -42,3 +43,22 @@ def test_unsupported_rectangular_meter_is_declined(calibration):
     result, _ = InspectionAgent().inspect("unsupported-test", image, calibration)
     assert result.state == "UNSUPPORTED_INSTRUMENT"
     assert result.reading_value is None
+
+
+def test_reading_and_disagreement_are_invariant_to_unit_scaling(calibration, clear_image):
+    reference, _ = InspectionAgent().inspect('reference', clear_image, calibration)
+    small_scale = GaugeCalibration(**{**calibration.model_dump(), 'maximum_value': 0.001})
+    scaled, _ = InspectionAgent().inspect('small-units', clear_image, small_scale)
+    assert reference.state == scaled.state == 'VERIFIED'
+    assert abs(reference.reading_value / 100 - scaled.reading_value / 0.001) < 1e-8
+    assert reference.normalized_disagreement_pct_fs == scaled.normalized_disagreement_pct_fs
+
+
+def test_large_finite_scale_does_not_overflow_the_fused_reading(calibration):
+    from math import isfinite
+
+    large_scale = GaugeCalibration(**{**calibration.model_dump(), 'maximum_value': 1e308})
+    result, _ = InspectionAgent().inspect('large-units', make_gauge(0.94, seed=17).image, large_scale)
+    assert result.state == 'VERIFIED'
+    assert isfinite(result.reading_value)
+    assert abs(result.reading_value / 1e308 - 0.94) < 0.02

@@ -1,5 +1,9 @@
 # AWS deployment
 
+For the judge demo, use [the AWS access guide](../docs/AWS_ACCESS.md). It prepares a dedicated GitHub OIDC role and an x86 ECS Express Mode service with a managed HTTPS URL. The workflow remains disabled until the owner's role and region are configured. A live smoke test and recording are required before marking AWS complete.
+
+The remainder of this page describes the older advanced ARM64 template, which is a separate deployment option.
+
 ## Status
 
 The template is prepared, but no AWS deployment was attempted. The managed environment reports no AWS secret, runtime variable, or outbound identity, and the AWS CLI is not installed. No AWS resources or costs were created. The current API keeps inspections in process memory; the template deliberately fixes the service to one Fargate task.

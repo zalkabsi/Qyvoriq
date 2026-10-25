@@ -9,9 +9,12 @@ on:
       - .github/workflows/deploy-aws.yml
       - Dockerfile
       - requirements.txt
+      - requirements-lock.txt
       - backend/**
       - frontend/**
       - scripts/smoke_deployment.py
+      - scripts/record_demo.py
+      - requirements-demo.txt
 permissions:
   contents: read
 concurrency:
@@ -24,6 +27,7 @@ jobs:
       enabled: ${{ steps.config.outputs.enabled }}
       region: ${{ steps.config.outputs.region }}
       role: ${{ steps.config.outputs.role }}
+      team: ${{ steps.config.outputs.team }}
     steps:
       - uses: actions/checkout@v4
       - id: config
@@ -34,12 +38,14 @@ jobs:
           enabled = config.get('enabled') is True
           region = config.get('region', '')
           role = config.get('role_arn', '')
+          team = config.get('team', '')
+          assert isinstance(team, str) and 0 < len(team) <= 120 and '\n' not in team and '\r' not in team
           assert config.get('bootstrap_stack') == 'qyvoriq-access'
           if enabled:
               assert re.fullmatch(r'[a-z]{2}-[a-z]+-\d', region)
               assert re.fullmatch(r'arn:aws:iam::\d{12}:role/qyvoriq-github-deploy', role)
           with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
-              stream.write(f'enabled={str(enabled).lower()}\nregion={region}\nrole={role}\n')
+              stream.write(f'enabled={str(enabled).lower()}\nregion={region}\nrole={role}\nteam={team}\n')
           print('AWS deployment enabled:', enabled)
   deploy:
     needs: config
@@ -51,6 +57,7 @@ jobs:
       id-token: write
     env:
       AWS_REGION: ${{ needs.config.outputs.region }}
+      QYVORIQ_TEAM_NAME: ${{ needs.config.outputs.team }}
     steps:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v6.3.0
@@ -60,6 +67,9 @@ jobs:
           role-session-name: qyvoriq-demo-${{ github.run_id }}
           role-duration-seconds: 3600
           mask-aws-account-id: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Read bootstrap and check default public networking
         run: |
           aws cloudformation describe-stacks --stack-name qyvoriq-access --query 'Stacks[0].Outputs' --output json > /tmp/qyvoriq-bootstrap.json
@@ -104,6 +114,13 @@ jobs:
           PY
       - name: Verify the actual deployed application
         run: |
+          for attempt in $(seq 1 24); do
+            if curl --fail --silent --max-time 15 "$DemoUrl/api/health/ready" >/dev/null; then
+              break
+            fi
+            sleep 10
+          done
+          curl --fail --silent --max-time 15 "$DemoUrl/api/health/ready" >/dev/null
           token=$(aws secretsmanager get-secret-value --secret-id "$ApiTokenSecretArn" --query SecretString --output text)
           echo "::add-mask::$token"
           export QYVORIQ_API_TOKEN="$token"
@@ -112,9 +129,41 @@ jobs:
             --revision "$GITHUB_SHA" --service-arn "$ServiceArn"
           printf 'Judge demo: %s\n' "$DemoUrl" >> "$GITHUB_STEP_SUMMARY"
           printf 'Source revision: %s\n' "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          aws ecs describe-express-gateway-service --service-arn "$ServiceArn" > artifacts/express-service.json
+          if ! aws ecr describe-image-scan-findings --repository-name qyvoriq-demo --image-id imageDigest="$ImageDigest" > artifacts/ecr-scan.json 2> artifacts/ecr-scan-error.txt; then
+            echo 'ECR scan findings could not be read; inspect the saved diagnostic before sign-off.' >> "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: qyvoriq-deployment-evidence
-          path: artifacts/deployment-evidence.json
+          path: |
+            artifacts/deployment-evidence.json
+            artifacts/express-service.json
+            artifacts/ecr-scan.json
+            artifacts/ecr-scan-error.txt
+          if-no-files-found: error
+          retention-days: 30
+      - name: Install demo recording tools
+        run: |
+          python -m pip install -r requirements-demo.txt
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m playwright install --with-deps chromium
+      - name: Record the verified live AWS application with narration
+        run: |
+          token=$(aws secretsmanager get-secret-value --secret-id "$ApiTokenSecretArn" --query SecretString --output text)
+          echo "::add-mask::$token"
+          export QYVORIQ_API_TOKEN="$token"
+          export QYVORIQ_CHROMIUM=$(python -c 'from playwright.sync_api import sync_playwright; p=sync_playwright().start(); print(p.chromium.executable_path); p.stop()')
+          python -m scripts.record_demo --url "$DemoUrl" --output artifacts/judge-demo \
+            --team "$QYVORIQ_TEAM_NAME" --deployment-evidence artifacts/deployment-evidence.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qyvoriq-narrated-judge-video
+          path: |
+            artifacts/judge-demo/qyvoriq-judge-demo.mp4
+            artifacts/judge-demo/captions.srt
+            artifacts/judge-demo/recording-evidence.json
+            artifacts/judge-demo/proof/*.png
           if-no-files-found: error
           retention-days: 30

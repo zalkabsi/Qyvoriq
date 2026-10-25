@@ -1,5 +1,7 @@
 import numpy as np
 import pytest
+from io import BytesIO
+from PIL import Image
 
 from backend.vision.estimators import NeedleNotFound, estimate_needle_geometric, estimate_needle_polar
 from backend.vision.evidence import generate_evidence
@@ -17,6 +19,28 @@ def test_image_validation_decodes_and_rejects_bad_content(encode_png, clear_imag
     assert decoded.bgr.shape == clear_image.shape
     with pytest.raises(InvalidImage, match="could not be decoded"):
         decode_image(b"not an image")
+
+
+def test_large_images_are_bounded_before_vision_and_orientation_is_preserved():
+    output = BytesIO()
+    Image.new("RGB", (2400, 1200), "white").save(output, format="PNG")
+    decoded = decode_image(output.getvalue())
+    assert (decoded.width, decoded.height) == (1600, 800)
+    assert decoded.bgr.shape == (800, 1600, 3)
+    output = BytesIO()
+    exif = Image.Exif()
+    exif[274] = 6
+    Image.new("RGB", (400, 200), "white").save(output, format="JPEG", exif=exif)
+    decoded = decode_image(output.getvalue())
+    assert decoded.orientation_corrected
+    assert (decoded.width, decoded.height) == (200, 400)
+
+
+def test_elongated_images_fail_before_small_dimensions_reach_opencv():
+    output = BytesIO()
+    Image.new('RGB', (200, 5000), 'white').save(output, format='PNG')
+    with pytest.raises(InvalidImage, match='too narrow'):
+        decode_image(output.getvalue())
 
 
 def test_quality_flags_glare_and_blur(clear_image):

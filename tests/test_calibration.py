@@ -1,5 +1,6 @@
 from backend.schemas import GaugeCalibration
 from backend.vision.calibration import angle_to_value
+import pytest
 
 
 def test_clockwise_wraparound_and_midpoint(calibration):
@@ -41,3 +42,9 @@ def test_invalid_scale_and_sweep_are_rejected():
         pass
     else:
         raise AssertionError("a sweep under 20 degrees must be invalid")
+
+
+@pytest.mark.parametrize("minimum,maximum", [(0, float("nan")), (0, float("inf")), (-float("inf"), 1), (-1e308, 1e308)])
+def test_nonfinite_calibration_cannot_reach_vision(minimum, maximum):
+    with pytest.raises(ValueError):
+        GaugeCalibration(minimum_value=minimum, maximum_value=maximum, units="psi", start_angle_deg=135, end_angle_deg=45, sweep_direction="clockwise")

@@ -44,7 +44,9 @@ The values below are from the checked-in `latest.json`. Percentages are syntheti
 | Baseline B — fixed mean | 109/120 | 90.83% | 0.2863 | 0.4619 | 0% (0/109) |
 | Qyvoriq C — selective | 59/120 | 49.17% | 0.2793 | 0.4161 | 0% (0/59) |
 
-The test set contains 30 images per condition. Qyvoriq verified all 30 clear images, none of the 30 glare or 30 blur images, and 29 of 30 noisy images; the remaining image requested reinspection. It made no false accepts above 5% FS on this controlled test set. Its mean per-image latency was 63.332 ms on this x86-64 executor, compared with 31.230 ms for geometric-only and 32.497 ms for fixed-mean fusion. The selective policy therefore accepted fewer images while recording similar synthetic error to the fixed-mean baseline; this tradeoff is not evidence of real-world safety or accuracy.
+The test set contains 30 images per condition. Qyvoriq verified all 30 clear images, none of the 30 glare or 30 blur images, and 29 of 30 noisy images; the remaining image requested reinspection. It made no false accepts above 5% FS on this controlled test set. The refreshed run's mean per-image latency was 87.875 ms on this shared x86-64 executor, compared with 44.158 ms for geometric-only and 45.925 ms for fixed-mean fusion. Resources were not isolated, so these are run observations rather than deployment performance guarantees. The selective policy accepted fewer images while recording similar synthetic error to fixed fusion; this tradeoff is not evidence of real-world safety or accuracy.
+
+The JSON also reports a 95% Wilson interval for the observed false-accept proportion under a simple binomial model. With 0/59 errors above 5% FS, its upper endpoint is approximately 6.11%, illustrating the limited evidence in a small accepted set. This model-based interval applies to the generated sample assumptions; it is not a bound on field risk.
 
 ## Reproduce
 
@@ -52,6 +54,13 @@ The test set contains 30 images per condition. Qyvoriq verified all 30 clear ima
 PYTHONPATH=. .venv/bin/python -m benchmarks.run_benchmark --split validation --samples 120 --output benchmarks/results/validation.json
 PYTHONPATH=. .venv/bin/python -m benchmarks.calibrate_policy --input benchmarks/results/validation.json
 PYTHONPATH=. .venv/bin/python -m benchmarks.run_benchmark --split test --samples 120 --output benchmarks/results/latest.json
+PYTHONPATH=. .venv/bin/python -m benchmarks.run_reinspection --samples 30
 ```
 
-`GET /api/benchmarks` exposes the latest JSON, and the Evaluation tab renders those actual values with a synthetic-only label. The synthetic paired clear/glare fixtures demonstrate the API follow-up path, but no multi-view success rate is reported. There is no real multi-capture dataset or real-world gauge evaluation in this repository.
+`GET /api/benchmarks` exposes the latest JSON and the paired-observation result, and the Evaluation tab renders those actual values with synthetic-only labels.
+
+## Controlled follow-up test
+
+`benchmarks/results/reinspection.json` records a separate actual run of 30 paired observations. Each pair has an identical generated dial, geometry and stable reading, once with rendered glare and once without it. The seeds start at 42026 and are separate from the single-image validation/test ranges. All 30 glare inputs requested another observation and skipped both estimators; all 30 clear follow-ups were verified within 2% FS. All 30 persistent-glare cases escalated at the bounded retry limit.
+
+This tests recovery when a user supplies a controlled cleaner observation. It does not measure physical camera retakes, changing viewpoints, time-varying instruments, or real-world inspection success. There is no real multi-capture dataset or real-gauge evaluation in this repository.

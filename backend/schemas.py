@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Literal
+from math import isfinite
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -8,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 class GaugeCalibration(BaseModel):
     """User-supplied scale calibration; angles use image coordinates."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, allow_inf_nan=False)
 
     minimum_value: float
     maximum_value: float
@@ -22,6 +23,8 @@ class GaugeCalibration(BaseModel):
     def validate_scale(self) -> "GaugeCalibration":
         if self.maximum_value <= self.minimum_value:
             raise ValueError("maximum_value must be greater than minimum_value")
+        if not isfinite(self.maximum_value - self.minimum_value):
+            raise ValueError("full-scale span must be finite")
         clockwise = (self.end_angle_deg - self.start_angle_deg) % 360.0
         span = clockwise if self.sweep_direction == "clockwise" else (360.0 - clockwise) % 360.0
         if span < 20.0 or span > 330.0:

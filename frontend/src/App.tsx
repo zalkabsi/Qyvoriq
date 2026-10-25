@@ -31,6 +31,7 @@ type Benchmark = {
   summary?: Record<string, { predicted_count: number; coverage: number; mae_fs_pct: number | null; p95_abs_error_fs_pct: number | null; false_accept_rate_over_5pct_fs: number | null }>;
   selective_risk_curve_fixed_mean?: { disagreement_threshold_pct_fs: number; accepted_count: number; coverage: number; selective_mae_pct_fs: number | null; false_accept_rate_over_5pct_fs: number | null }[];
   failure_rate_by_condition?: Record<string, { sample_count: number; verified_count: number; agent_abstention_rate: number; agent_selective_mae_pct_fs: number | null }>;
+  paired_reinspection?: { samples: number; follow_up_success_within_2pct_fs_count: number; persistent_glare_human_escalation_count: number };
 };
 
 const scenarios = [
@@ -41,6 +42,11 @@ const scenarios = [
 ];
 
 const initialCalibration = { minimum_value: "0", maximum_value: "100", units: "psi", start_angle_deg: "135", end_angle_deg: "45", sweep_direction: "clockwise" };
+
+function formatReading(value: number) {
+  const magnitude = Math.abs(value);
+  return new Intl.NumberFormat(undefined, { maximumSignificantDigits: 4, notation: magnitude > 0 && (magnitude < 0.0001 || magnitude >= 10000000) ? "scientific" : "standard" }).format(value);
+}
 
 function Icon({ name, size = 18 }: { name: string; size?: number }) {
   const common = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true as const };
@@ -136,6 +142,11 @@ function App() {
     setError("");
   }
 
+  function resetInspection() {
+    setResult(null);
+    setSelectedImage(null);
+  }
+
   function onFileChange(event: ChangeEvent<HTMLInputElement>) {
     setSelectedImage(event.target.files?.[0] ?? null);
   }
@@ -228,7 +239,7 @@ function App() {
 
               <div className="content-grid">
                 <section className="panel input-panel">
-                  <div className="panel-header"><div><span className="step-number">01</span><h2>New inspection</h2></div><span className="panel-meta">JPEG · PNG · WEBP <span>≤ 10 MB</span></span></div>
+                  <div className="panel-header"><div><span className="step-number">01</span><h2>{canFollowUp ? "Add another observation" : "New inspection"}</h2></div>{result ? <button className="sample-button" type="button" onClick={resetInspection} disabled={busy} aria-label="Start a new inspection">New inspection ↗</button> : <span className="panel-meta">JPEG · PNG · WEBP <span>≤ 10 MB</span></span>}</div>
                   <form onSubmit={submitInspection}>
                     <label className={`dropzone ${dragging ? "dragging" : ""} ${file ? "has-file" : ""}`} onDragOver={(event) => { event.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={onDrop}>
                       <input type="file" accept="image/jpeg,image/png,image/webp" onChange={onFileChange} aria-label="Choose a gauge image" />
@@ -239,15 +250,15 @@ function App() {
                     <p className="sample-note">All scenarios are generated, labeled synthetic fixtures. “Clear gauge” is paired with “glass reflection” at the same 63 psi setting.</p>
 
                     <div className="form-section-heading"><div><span className="step-number">02</span><h3>Scale calibration</h3></div><span>Required for a numeric reading</span></div>
-                    <div className="form-grid">
+                    <fieldset className="form-grid" disabled={canFollowUp || busy} aria-label="Gauge calibration">
                       <label className="field"><span>Minimum value</span><div className="input-wrap"><input type="number" step="any" value={calibration.minimum_value} onChange={(event) => setCalibration({ ...calibration, minimum_value: event.target.value })} required /><span className="field-unit">LOW</span></div></label>
                       <label className="field"><span>Maximum value</span><div className="input-wrap"><input type="number" step="any" value={calibration.maximum_value} onChange={(event) => setCalibration({ ...calibration, maximum_value: event.target.value })} required /><span className="field-unit">HIGH</span></div></label>
                       <label className="field"><span>Units</span><input type="text" value={calibration.units} onChange={(event) => setCalibration({ ...calibration, units: event.target.value })} maxLength={20} placeholder="psi" required /></label>
                       <label className="field"><span>Needle sweep</span><select value={calibration.sweep_direction} onChange={(event) => setCalibration({ ...calibration, sweep_direction: event.target.value })}><option value="clockwise">Clockwise</option><option value="counterclockwise">Counterclockwise</option></select></label>
                       <label className="field"><span>Minimum angle <small>image degrees</small></span><input type="number" min="0" max="360" step="any" value={calibration.start_angle_deg} onChange={(event) => setCalibration({ ...calibration, start_angle_deg: event.target.value })} required /></label>
                       <label className="field"><span>Maximum angle <small>image degrees</small></span><input type="number" min="0" max="360" step="any" value={calibration.end_angle_deg} onChange={(event) => setCalibration({ ...calibration, end_angle_deg: event.target.value })} required /></label>
-                    </div>
-                    <div className="calibration-hint"><span className="hint-mark">i</span><span>Angle 0° points right; angles increase clockwise on the image. Enter your gauge’s actual endpoints.</span></div>
+                    </fieldset>
+                    <div className="calibration-hint"><span className="hint-mark">i</span><span>{canFollowUp ? "Calibration stays fixed for this inspection. Start a new inspection to change the gauge or scale." : "Angle 0° points right; angles increase clockwise on the image. Enter your gauge’s actual endpoints."}</span></div>
                     {error && <div className="error-banner" role="alert"><Icon name="info" size={17} />{error}</div>}
                     <button className="primary-button" type="submit" disabled={busy || !file}>{busy ? <><span className="spinner" /> Running visual checks…</> : canFollowUp ? <><Icon name="camera" size={17} /> Submit next view <Icon name="arrow" size={17} /></> : <>Start inspection <Icon name="arrow" size={17} /></>}</button>
                     <div className="safe-note"><Icon name="shield" size={15} /><span>Decision support only. Never use as the sole basis for safety-critical control.</span></div>
@@ -263,7 +274,7 @@ function App() {
                     {result?.state === "HUMAN_REVIEW_REQUIRED" && <div className="review-chip"><Icon name="info" size={15} /> Review with a qualified operator</div>}
                   </div>
 
-                  <div className="reading-row"><div className="reading-main"><span className="reading-label">POLICY-ACCEPTED READING</span><div className="reading-value">{result?.reading_value !== null && result?.reading_value !== undefined ? <>{result.reading_value.toFixed(2)}<span>{result.units}</span></> : <><span className="empty-reading">—</span><span className="waiting-label">not accepted</span></>}</div></div><div className="reading-divider" /><div className="reading-secondary"><span>ESTIMATOR DELTA</span><strong>{result?.normalized_disagreement_pct_fs !== null && result?.normalized_disagreement_pct_fs !== undefined ? `${result.normalized_disagreement_pct_fs.toFixed(2)}% FS` : "—"}</strong><small>full-scale span</small></div></div>
+                  <div className="reading-row"><div className="reading-main"><span className="reading-label">POLICY-ACCEPTED READING</span><div className="reading-value">{result?.reading_value !== null && result?.reading_value !== undefined ? <>{formatReading(result.reading_value)}<span>{result.units}</span></> : <><span className="empty-reading">—</span><span className="waiting-label">not accepted</span></>}</div></div><div className="reading-divider" /><div className="reading-secondary"><span>ESTIMATOR DELTA</span><strong>{result?.normalized_disagreement_pct_fs !== null && result?.normalized_disagreement_pct_fs !== undefined ? `${result.normalized_disagreement_pct_fs.toFixed(2)}% FS` : "—"}</strong><small>full-scale span</small></div></div>
 
                   <div className="evidence-section"><div className="section-label-row"><h3>Visual evidence</h3><span>{result?.geometry?.method ? result.geometry.method.replaceAll("_", " ") : "Original stays unchanged"}</span></div><div className="evidence-compare">
                     <div className="image-frame"><div className="frame-label">SOURCE VIEW</div>{preview ? <img src={preview} alt="Original inspection image" /> : <div className="empty-frame"><Icon name="camera" size={22} /><span>Upload an image to begin</span></div>}</div>
@@ -271,7 +282,7 @@ function App() {
                   </div></div>
 
                   <div className="detail-grid">
-                    <div className="detail-block"><div className="section-label-row"><h3>Estimator checks</h3><span>{result?.measurements.length ? "2 evidence paths" : "awaiting usable evidence"}</span></div>{result?.measurements.length ? result.measurements.map((measurement) => <div className="method-row" key={`${measurement.estimator}-${measurement.pass_number}`}><span className={`method-marker ${measurement.estimator}`} /> <span className="method-name">{measurement.estimator} <small>pass {measurement.pass_number}</small></span><strong>{measurement.value.toFixed(2)} {measurement.units}</strong><Icon name={measurement.in_calibration_range ? "check" : "info"} size={15} /></div>) : <div className="empty-methods">Candidates stay hidden when evidence is insufficient.</div>}</div>
+                    <div className="detail-block"><div className="section-label-row"><h3>Estimator checks</h3><span>{result?.measurements.length ? "2 evidence paths" : "awaiting usable evidence"}</span></div>{result?.measurements.length ? result.measurements.map((measurement) => <div className="method-row" key={`${measurement.estimator}-${measurement.pass_number}`}><span className={`method-marker ${measurement.estimator}`} /> <span className="method-name">{measurement.estimator} <small>pass {measurement.pass_number}</small></span><strong>{formatReading(measurement.value)} {measurement.units}</strong><Icon name={measurement.in_calibration_range ? "check" : "info"} size={15} /></div>) : <div className="empty-methods">Candidates stay hidden when evidence is insufficient.</div>}</div>
                     <div className="detail-block"><div className="section-label-row"><h3>Image quality</h3><span className={result?.image_quality.usable ? "text-good" : result ? "text-warn" : ""}>{result ? result.image_quality.usable ? "usable" : "needs attention" : "not assessed"}</span></div>{result?.image_quality.metrics ? <div className="quality-metrics"><div><span>Blur signal</span><strong>{result.image_quality.metrics.laplacian_variance?.toFixed(0) ?? "—"}</strong></div><div><span>Contrast range</span><strong>{result.image_quality.metrics.contrast_p95_p5?.toFixed(0) ?? "—"}</strong></div><div><span>Glare regions</span><strong>{result.image_quality.glare_boxes?.length ?? 0}</strong></div></div> : <div className="empty-methods">Blur, exposure, contrast, and glare checks.</div>}</div>
                   </div>
 
@@ -299,6 +310,7 @@ function EvaluationView({ benchmark }: { benchmark: Benchmark | null }) {
       <div className="metric-cards">{["qyvoriq_selective", "baseline_b_fixed_mean", "baseline_a_geometric"].map((key) => { const item = summary[key]; return <div className={`panel metric-card ${key === "qyvoriq_selective" ? "featured" : ""}`} key={key}><span className="metric-overline">{labels[key]}</span><strong>{item?.mae_fs_pct === null || item?.mae_fs_pct === undefined ? "—" : `${item.mae_fs_pct.toFixed(2)}%`}</strong><span>mean absolute error · full scale</span><div className="metric-foot"><span>Coverage</span><b>{item ? `${(item.coverage * 100).toFixed(1)}%` : "—"}</b></div><div className="metric-foot"><span>False accepts &gt; 5% FS</span><b>{item?.false_accept_rate_over_5pct_fs === null || item?.false_accept_rate_over_5pct_fs === undefined ? "—" : `${(item.false_accept_rate_over_5pct_fs * 100).toFixed(1)}%`}</b></div></div>; })}</div>
       <div className="evaluation-grid"><div className="panel eval-panel"><div className="panel-header"><div><span className="step-number">A</span><h2>Selective risk vs coverage</h2></div><span className="panel-meta">Fixed-mean comparator</span></div><div className="risk-table"><div className="risk-head"><span>Disagreement cap</span><span>Coverage</span><span>Selective MAE</span><span>False accept</span></div>{benchmark.selective_risk_curve_fixed_mean?.map((row) => <div className="risk-row" key={row.disagreement_threshold_pct_fs}><span>{row.disagreement_threshold_pct_fs.toFixed(1)}% FS</span><div className="bar-cell"><i style={{ width: `${Math.max(1, row.coverage * 100)}%` }} /><b>{(row.coverage * 100).toFixed(0)}%</b></div><span>{row.selective_mae_pct_fs === null ? "—" : `${row.selective_mae_pct_fs.toFixed(2)}%`}</span><span>{row.false_accept_rate_over_5pct_fs === null ? "—" : `${(row.false_accept_rate_over_5pct_fs * 100).toFixed(1)}%`}</span></div>)}</div><p className="footnote">The curve varies only the two-estimator disagreement cap. Quality and calibration-range gates remain fixed.</p></div>
         <div className="panel eval-panel"><div className="panel-header"><div><span className="step-number">B</span><h2>Failure by condition</h2></div></div><div className="condition-table">{Object.entries(benchmark.failure_rate_by_condition ?? {}).map(([condition, values]) => <div className="condition-row" key={condition}><div><strong>{condition}</strong><span>{values.sample_count} samples</span></div><div className="condition-bar"><i style={{ width: `${Math.max(2, values.agent_abstention_rate * 100)}%` }} /></div><strong>{(values.agent_abstention_rate * 100).toFixed(0)}%<small> abstained</small></strong></div>)}</div><p className="footnote">A high abstention rate can be appropriate when image evidence is poor.</p></div></div>
+      {benchmark.paired_reinspection && <div className="panel eval-panel paired-evaluation"><h2>Controlled follow-up observations</h2><p>{benchmark.paired_reinspection.follow_up_success_within_2pct_fs_count}/{benchmark.paired_reinspection.samples} paired glare/clear cases resolved within 2% of full scale. {benchmark.paired_reinspection.persistent_glare_human_escalation_count}/{benchmark.paired_reinspection.samples} persistent-glare cases escalated at the retry limit.</p><p className="footnote">Same synthetic dial and stable setting, with and without rendered glare. This does not measure physical camera retakes or field success.</p></div>}
       <div className="limitations-note"><Icon name="info" size={17} /><p><strong>Scope of this result.</strong> Synthetic dials test code behavior and policy plumbing only. Qyvoriq has not been evaluated on SyncG or a real-gauge dataset in this workspace. Do not generalize these values to factories or field use.</p></div>
     </>}
   </section>;

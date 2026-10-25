@@ -10,15 +10,17 @@ COPY frontend/ ./
 RUN npm run build
 
 FROM python:3.12-slim-bookworm AS runtime
+ARG QYVORIQ_REVISION=unknown
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    QYVORIQ_ENV=production
+    QYVORIQ_ENV=production \
+    QYVORIQ_REVISION=${QYVORIQ_REVISION}
 WORKDIR /app
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
-COPY requirements.txt ./requirements.txt
+COPY requirements.txt requirements-lock.txt ./
 RUN --mount=type=secret,id=proxy_ca,required=false \
     --mount=type=secret,id=system_ca,required=false \
     set -eu; \
@@ -40,4 +42,4 @@ USER 10001:10001
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
   CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health/ready', timeout=2)" || exit 1
-CMD ["uvicorn", "backend.api:app", "--host", "0.0.0.0", "--port", "8080", "--proxy-headers", "--forwarded-allow-ips", "*"]
+CMD ["uvicorn", "backend.api:app", "--host", "0.0.0.0", "--port", "8080", "--no-proxy-headers"]

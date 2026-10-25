@@ -50,7 +50,7 @@ def test_create_status_result_and_evidence(encode_png, clear_image):
     assert evidence.headers["content-type"] == "image/png"
 
 
-def test_real_followup_image_resolves_a_glare_request(encode_png):
+def test_supplied_followup_image_resolves_a_synthetic_glare_request(encode_png):
     glare = make_gauge(0.63, seed=17, glare=True).image
     clear = make_gauge(0.63, seed=17).image
     with TestClient(app) as client:
@@ -75,3 +75,18 @@ def test_upload_limits_and_missing_inspection_are_controlled():
     assert unsupported.status_code == 415
     assert unsupported.json()["error"]["code"] == "unsupported_media_type"
     assert missing.status_code == 404
+
+
+def test_body_limit_rejects_before_multipart_parsing():
+    with TestClient(app) as client:
+        response = client.post('/api/inspections', content=b'x' * (11 * 1024 * 1024), headers={'Content-Type': 'application/octet-stream'})
+    assert response.status_code == 413
+    assert response.json()['error']['code'] == 'upload_too_large'
+
+
+def test_deployed_api_token_protects_results_and_keeps_health_public(monkeypatch):
+    monkeypatch.setattr('backend.api.api_token', 'test-only-demo-token')
+    with TestClient(app) as client:
+        assert client.get('/api/health/ready').status_code == 200
+        assert client.get('/api/benchmarks').status_code == 401
+        assert client.get('/api/benchmarks', headers={'Authorization': 'Bearer test-only-demo-token'}).status_code == 200

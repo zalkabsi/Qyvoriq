@@ -1,6 +1,10 @@
 # Five-minute demo video script
 
-**Status:** `NOT RECORDED`. The file is a production plan, not a video or proof of deployment. Official requirements say the public/unlisted video must be no longer than five minutes and show the team, application, architecture, and principal results.
+**Status:** final AWS recording and public/unlisted hosting pending. `scripts/record_demo.py` produces an actual narrated screen recording with captions. Local runs are marked `LOCAL PREVIEW · AWS DEPLOYMENT PENDING`; final mode requires a passing deployment-evidence file. The confirmed team is sole creator **Zein Alkabsi**, using the connected GitHub display name. No human footage is fabricated. Narration uses the stock `en-US-EmmaMultilingualNeural` voice through the user-authorized `speech.platform.bing.com` endpoint.
+
+The generated narration uses the actual benchmark API values. A local preview is an editing and workflow artifact; it is not AWS proof or the final submitted video.
+
+The first actual narrated local export was **243.2 seconds (4:03.2)** at 1600×1000, H.264/AAC, with seven checked browser submissions and burned-in captions. Its scope and executed states are recorded in `docs/evidence/local-preview.json`. The public/unlisted final AWS video has not been produced or hosted yet.
 
 | Time | Shot / on-screen text | Voiceover and action |
 | --- | --- | --- |
@@ -20,3 +24,15 @@
 - Show the AWS endpoint only if it has been deployed and independently checked. A local app is not AWS proof.
 - Show the generated benchmark JSON and repository commit used in the recording.
 - Keep the final video below five minutes and publish it public/unlisted with access enabled for judges.
+
+## Generate a recording
+
+Install `requirements-demo.txt` and system Chromium/FFmpeg. Start a built app locally, then run:
+
+```bash
+PYTHONPATH=. .venv/bin/python -m scripts.record_demo \
+  --url http://127.0.0.1:8000 --output demo-output/local \
+  --team 'Zein Alkabsi' --preview
+```
+
+For the final recording, use the actual HTTPS AWS URL, set `QYVORIQ_API_TOKEN` through the environment, omit `--preview`, and supply `--deployment-evidence` from the passing HTTP smoke check. The script records real browser requests and asserts clear, glare, follow-up, bounded human escalation and unsupported states. It exports a captioned MP4, narration audio, SRT captions, screenshots and a timing/check manifest, and rejects an export over five minutes. Never publish the token value or source credential files.

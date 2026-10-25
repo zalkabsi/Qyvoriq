@@ -28,9 +28,9 @@ The current cap is stored with provenance in `backend/agents/policy.json`. It wa
 
 ## API, frontend, and AWS design
 
-FastAPI exposes image creation, state, result, evidence, and follow-up endpoints. Uploads are limited to 10 MB and 16 MP; images and traces remain in memory for at most 30 minutes. React provides calibration fields, scenario fixtures, image/evidence comparison, policy status, trace, and a benchmark tab.
+FastAPI exposes image creation, state, result, evidence, and follow-up endpoints. Uploads are limited to 10 MB and 16 MP, then normalized to a 1600-pixel long edge. Source arrays are discarded after analysis. Retained evidence is capped at 100 records and 128 MiB of PNGs, with 30-minute inactivity expiry and a 30-second cleanup sweep. Multipart parsing may use ephemeral OS temporary files; no durable image store is configured. React provides calibration fields, scenario fixtures, image/evidence comparison, trace, and measured evaluations. Calibration is locked during follow-ups; a separate new-inspection action resets the workflow.
 
-The AWS artifact describes an ARM64 Fargate task behind an HTTPS ALB, private scan-on-push ECR, token retrieval from Secrets Manager, and seven-day CloudWatch logs. No deployment exists. The template assumes a VPC, public subnets, DNS, and ACM certificate. It uses standard OpenCV wheels, not COOL. There is no object store, relational store, or durable session data.
+The primary AWS judge-demo artifact uses the tested x86 image on ECS Express Mode/Fargate with a managed HTTPS ALB endpoint, private scan-on-push ECR, a Secrets Manager token, and seven-day application logs. A repository-specific GitHub OIDC role enables short-lived deployment credentials. No AWS deployment exists yet; the account owner must apply the access bootstrap first. The account needs a default VPC and public subnets. The older ARM64 template remains a separate advanced design with owner-supplied DNS/ACM. Standard OpenCV wheels are used; COOL has not been executed. There is no durable session store.
 
 ## Dataset and experimental design
 
@@ -40,7 +40,9 @@ No external gauge dataset is bundled. The benchmark generator creates synthetic 
 
 See [`docs/EVALUATION.md`](EVALUATION.md) and the structured test result [`benchmarks/results/latest.json`](../benchmarks/results/latest.json). Results are limited to generated synthetic scenes and an x86-64 runtime. They do not establish field accuracy, and no AWS, Graviton, or COOL performance result is claimed.
 
-On the disjoint 120-image synthetic test split, the policy verified 59 images (49.17% coverage), with 0.2793% FS mean absolute error and no accepted error above 5% FS. It reinspection-rejected all generated glare and blur samples. The fixed-mean baseline accepted 109 images (90.83%) with 0.2863% FS MAE. These paired synthetic results show a coverage/error tradeoff on this renderer only; they do not validate a deployed or field measurement system.
+On the disjoint 120-image synthetic test split, the policy verified 59 images (49.17% coverage), with 0.2793% FS mean absolute error and no accepted error above 5% FS. It requested reinspection for all generated glare and blur samples. The fixed-mean baseline accepted 109 images (90.83%) with 0.2863% FS MAE. The policy accepts fewer images with similar synthetic error; this experiment does not demonstrate improved field reliability or a clear accuracy advantage over fixed fusion.
+
+A separate executed controlled test covers 30 synthetic glare/clear pairs at identical stable dial states. All 30 first images skipped estimators and requested another observation, all 30 clear follow-ups resolved within 2% FS, and all 30 persistent-glare cases reached human escalation at the retry limit. The artifact is `benchmarks/results/reinspection.json`. This measures controlled workflow behavior; it is not a physical camera study.
 
 ## Failure analysis
 

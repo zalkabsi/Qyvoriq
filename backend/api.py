@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import hmac
+import asyncio
 import json
 import logging
 import os
 import re
 import time
 from collections import defaultdict, deque
+from contextlib import asynccontextmanager, suppress
+import platform
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -19,6 +22,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import ValidationError
 
 from backend.agents.orchestrator import MAX_FOLLOW_UPS, InspectionAgent, utc_now
+from backend.body_limit import BodyLimitMiddleware
 from backend.schemas import GaugeCalibration
 from backend.storage import InMemoryInspectionStore, InspectionRecord
 from backend.vision.image_input import InvalidImage, decode_image
@@ -41,11 +45,31 @@ if environment == "production" and not api_token:
     raise RuntimeError("QYVORIQ_API_TOKEN must be configured in production.")
 
 origins = [origin.strip() for origin in os.getenv("QYVORIQ_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if origin.strip()]
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    async def purge_loop() -> None:
+        while True:
+            await asyncio.sleep(30)
+            store.purge_expired()
+
+    cleanup = asyncio.create_task(purge_loop())
+    try:
+        yield
+    finally:
+        cleanup.cancel()
+        with suppress(asyncio.CancelledError):
+            await cleanup
+
+
 app = FastAPI(
     title="Qyvoriq Inspection API",
     version="0.1.0",
+    lifespan=lifespan,
     docs_url=None if environment == "production" else "/docs",
     redoc_url=None if environment == "production" else "/redoc",
+    openapi_url=None if environment == "production" else "/openapi.json",
 )
 app.add_middleware(
     CORSMiddleware,
@@ -55,6 +79,7 @@ app.add_middleware(
     allow_credentials=False,
     max_age=600,
 )
+app.add_middleware(BodyLimitMiddleware, max_bytes=MAX_UPLOAD_BYTES + 64 * 1024)
 
 
 class RateLimiter:
@@ -65,6 +90,14 @@ class RateLimiter:
 
     def allow(self, key: tuple[str, str], limit: int, period: int = 60) -> bool:
         now = time.monotonic()
+        if key not in self.windows and len(self.windows) >= 5000:
+            for old_key, old_window in tuple(self.windows.items()):
+                while old_window and old_window[0] <= now - period:
+                    old_window.popleft()
+                if not old_window:
+                    self.windows.pop(old_key, None)
+            if len(self.windows) >= 5000:
+                return False
         window = self.windows[key]
         while window and window[0] <= now - period:
             window.popleft()
@@ -171,7 +204,7 @@ def liveness() -> dict[str, str]:
 @app.get("/api/health/ready")
 def readiness() -> JSONResponse:
     opencv_ok = cv2.__version__.split(".", 1)[0] == "5"
-    payload = {"status": "ready" if opencv_ok else "not_ready", "opencv_version": cv2.__version__, "opencv_major": cv2.__version__.split(".", 1)[0]}
+    payload = {"status": "ready" if opencv_ok else "not_ready", "opencv_version": cv2.__version__, "opencv_major": cv2.__version__.split(".", 1)[0], "architecture": platform.machine(), "revision": os.getenv("QYVORIQ_REVISION", "development")}
     return JSONResponse(status_code=200 if opencv_ok else 503, content=payload)
 
 
@@ -194,7 +227,6 @@ async def create_inspection(request: Request, file: UploadFile = File(...), cali
         attempt_number=0,
         result=result,
         evidence_png=evidence,
-        latest_image=decoded.bgr,
     ))
     logger.info(json.dumps({"event": "inspection_created", "request_id": request.state.request_id, "inspection_id": inspection_id, "state": result.state, "attempt": 1, "opencv_version": cv2.__version__}))
     return result.model_dump(mode="json")
@@ -232,7 +264,11 @@ def benchmark_results() -> dict[str, Any]:
     if not path.is_file():
         return {"available": False, "message": "Run `python -m benchmarks.run_benchmark` to generate measured synthetic results."}
     try:
-        return {"available": True, **json.loads(path.read_text(encoding="utf-8"))}
+        output = {"available": True, **json.loads(path.read_text(encoding="utf-8"))}
+        paired = ROOT / "benchmarks" / "results" / "reinspection.json"
+        if paired.is_file():
+            output["paired_reinspection"] = json.loads(paired.read_text(encoding="utf-8"))
+        return output
     except (OSError, json.JSONDecodeError):
         raise HTTPException(503, "Benchmark results could not be loaded.")
 
@@ -250,6 +286,10 @@ async def add_follow_up_image(request: Request, inspection_id: str, file: Upload
         decoded = decode_image(raw)
     except InvalidImage as exc:
         raise HTTPException(422, str(exc)) from exc
+    # Recheck after awaiting the body: another request may have consumed a retry.
+    record = read_inspection_or_404(inspection_id)
+    if record.result.state != "REINSPECTION_REQUIRED" or record.attempt_number >= MAX_FOLLOW_UPS:
+        raise HTTPException(409, "This inspection is no longer waiting for another image.")
     attempt = record.attempt_number + 1
     now = utc_now()
     result, evidence = agent.inspect(
@@ -264,7 +304,6 @@ async def add_follow_up_image(request: Request, inspection_id: str, file: Upload
     record.updated_at = now
     record.result = result
     record.evidence_png = evidence
-    record.latest_image = decoded.bgr
     store.replace(inspection_id, record)
     logger.info(json.dumps({"event": "inspection_reobserved", "request_id": request.state.request_id, "inspection_id": inspection_id, "state": result.state, "attempt": attempt + 1, "opencv_version": cv2.__version__}))
     return result.model_dump(mode="json")

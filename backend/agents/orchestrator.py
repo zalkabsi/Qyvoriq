@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from typing import Any
+from math import isfinite
 
 import numpy as np
 import cv2
@@ -91,7 +92,7 @@ class InspectionAgent:
             pair = first_pair
             if pair:
                 disagreement = self.compare_measurements(pair, calibration)
-                log("VERIFYING", "compare_measurements", "Independent estimator outputs compared.", disagreement_pct_fs=round(disagreement, 3))
+                log("VERIFYING", "compare_measurements", "Geometric and polar outputs compared.", disagreement_pct_fs=round(disagreement, 3))
                 if disagreement > MAX_DISAGREEMENT_PCT_FS:
                     reasons.append(f"Initial estimators disagree by {disagreement:.2f}% of full scale.")
                     log("MEASURING", "reinspect_image", "Disagreement selected a contrast-normalized second pass.")
@@ -129,7 +130,7 @@ class InspectionAgent:
                         state = "HUMAN_REVIEW_REQUIRED"
                 else:
                     selected_measurements = pair
-                    reading_value = sum(item.value for item in pair) / len(pair)
+                    reading_value = sum(item.value / len(pair) for item in pair)
                     reasons.append("Image-quality, geometry, calibration-range, and estimator-agreement checks passed.")
                     state = "VERIFIED"
             else:
@@ -184,11 +185,14 @@ class InspectionAgent:
         measurements: list[Measurement] = []
         for estimate in estimates:
             calibrated = angle_to_value(estimate.angle_deg, calibration)
+            if not isfinite(calibrated.value):
+                failures.append(f"{estimate.estimator.capitalize()} estimate exceeded the supported numerical range.")
+                continue
             measurements.append(Measurement(
                 estimator=estimate.estimator,
                 pass_number=pass_number,
                 angle_deg=round(estimate.angle_deg, 3),
-                value=round(calibrated.value, 4),
+                value=calibrated.value,
                 units=calibration.units,
                 in_calibration_range=calibrated.in_range,
                 evidence=estimate.evidence,
@@ -199,7 +203,10 @@ class InspectionAgent:
     def compare_measurements(measurements: list[Measurement], calibration: GaugeCalibration) -> float:
         if len(measurements) < 2:
             return 100.0
-        return abs(measurements[0].value - measurements[1].value) / calibration.full_scale * 100.0
+        difference = measurements[0].value - measurements[1].value
+        if not isfinite(difference):
+            return 100.0  # Non-finite numerical evidence must fail the agreement gate.
+        return abs(difference) / calibration.full_scale * 100.0
 
     @staticmethod
     def request_new_view(quality_reasons: tuple[str, ...]) -> str:

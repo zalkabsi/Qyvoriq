@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-25T10:06:18+00:00",
+  "generated_at": "2026-10-25T14:49:15+00:00",
   "opencv_version": "5.0.0",
   "dataset_type": "synthetic_fixture_execution",
   "calibration": {
@@ -19,7 +19,7 @@
       "expected_behavior": "Assess image quality and return an evidence-backed result only if the independent estimates pass the policy.",
       "actual_output": {
         "state": "VERIFIED",
-        "reading_value": 63.24795,
+        "reading_value": 63.24790960322753,
         "units": "psi",
         "image_quality_reasons": [],
         "disagreement_pct_fs": 0.57,

@@ -11,6 +11,8 @@ coverage.xml
 !.env.example
 frontend/node_modules/
 frontend/dist/
+artifacts/
+demo-output/
 benchmarks/generated/
 benchmarks/results/local-*.json
 *.log

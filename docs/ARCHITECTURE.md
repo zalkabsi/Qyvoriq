@@ -39,17 +39,17 @@ The geometric estimator uses radial Hough line segments with a center-origin con
 | Component | Responsibility | State/data |
 | --- | --- | --- |
 | Vite/React client | Upload, calibration, evidence viewer, trace, benchmark dashboard | Browser session only |
-| FastAPI API | Validation, upload bounds, request IDs, status/result/evidence routes | In-memory store; 100 active inspections maximum; 30-minute expiry |
-| OpenCV 5 vision modules | Quality signals, circle/contour localization, geometric and polar estimators, annotation | CPU processing; input copy retained only during in-memory session |
+| FastAPI API | Validation, upload bounds, request IDs, status/result/evidence routes | At most 100 records and 128 MiB retained evidence; 30-minute inactivity expiry |
+| OpenCV 5 vision modules | Quality signals, circle/contour localization, geometric and polar estimators, annotation | Input limited to 16 MP and normalized to a 1600-pixel long edge; source arrays discarded after analysis |
 | Deterministic agent | Select next tool/action, bound retries, accept/reinspect/escalate | Trace appended to inspection record |
-| AWS deployment design | ARM64 ECS Fargate service, private ECR, HTTPS ALB, CloudWatch logs | Not deployed; one task; no durable storage |
+| AWS judge-demo design | x86 ECS Express Mode/Fargate, private ECR, managed HTTPS ALB, CloudWatch logs | Access setup prepared; not deployed; one steady-state task; no durable sessions |
 
 ## AWS diagram (planned, not deployed)
 
 ```mermaid
 flowchart LR
-  Judge[Judge browser] -->|HTTPS| ALB[Application Load Balancer + ACM]
-  ALB -->|8080 / health checks| ECS[ARM64 ECS Fargate task]
+  Judge[Judge browser] -->|Managed HTTPS URL| ALB[ECS Express Mode managed ALB]
+  ALB -->|8080 / health checks| ECS[x86 ECS Fargate task]
   ECR[Private ECR image] --> ECS
   ECS --> CV[FastAPI + OpenCV 5 vision workload]
   ECS --> CW[CloudWatch Logs, 7-day retention]
@@ -57,7 +57,9 @@ flowchart LR
   Judge -->|new view when requested| ALB
 ```
 
-The deployed container would run the substantive gauge pipeline on Fargate ARM64. It would use standard OpenCV 5 wheels, not COOL. Existing VPC/subnets, certificate, ECR image, and an API token secret are prerequisites. The task has no AWS permissions for inspection data; uploads stay in process memory and are not written to S3 or a database. A single Fargate task is selected to make the in-memory follow-up flow coherent; it is not durable or horizontally scalable.
+The primary demo path uses `deploy/express.yaml` with the tested x86 image and a managed HTTPS endpoint. `deploy/bootstrap.yaml` prepares GitHub OIDC access, ECR, the cluster, runtime roles, token secret and seven-day logs. The account needs a default VPC with public subnets. A successful deployment and live smoke-check artifact are still required; a template is not AWS execution evidence. See [AWS access setup](AWS_ACCESS.md).
+
+The task runs standard OpenCV 5 and has no application task role or AWS permission to store inspection data. Multipart parsing may use short-lived OS temporary files; no durable image store is configured. Source arrays are discarded after processing. Retained annotations are bounded by count and PNG byte budget, become inaccessible at 30-minute inactivity expiry, and are purged by a 30-second sweep. One task supports the current process-local workflow; replacement or deployment can lose a session. The original `deploy/service.yaml` remains a separate ARM64 design requiring owner-supplied networking, DNS and certificate. COOL has not been run.
 
 ## Tool contracts
 

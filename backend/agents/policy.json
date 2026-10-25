@@ -11,5 +11,5 @@
   "validation_pairs_over_5pct_fs": 0,
   "validation_false_accept_count_over_5pct_fs": 0,
   "caveat": "Fit only to generated synthetic scenes. This threshold has no established calibration on SyncG or real photographs.",
-  "calibrated_at": "2026-10-25T09:58:46+00:00"
+  "calibrated_at": "2026-10-25T14:47:56+00:00"
 }
