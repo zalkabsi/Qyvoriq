@@ -7,7 +7,7 @@ Checked against the live Devpost pages on 2026-10-25. This checklist records imp
 | Requirement | Current evidence | Status |
 | --- | --- | --- |
 | Substantive OpenCV 5 image analysis | `backend/vision/` uses OpenCV decoding, blur/exposure/glare measurements, Canny/Hough and contour dial localization, `warpPolar`, CLAHE refinement, and annotation. `/api/health/ready` checks the imported major version. The tested runtime was OpenCV 5.0.0. | `VERIFIED COMPLETE` locally |
-| Meaningful AWS component | `deploy/` contains a private-ECR, ARM64 ECS/Fargate deployment design that runs the API and vision code. No AWS identity, secret, or CLI is configured in this environment; no stack was deployed and no endpoint exists. | `BLOCKED` |
+| Meaningful AWS component | `deploy/` contains a private-ECR, ARM64 ECS/Fargate deployment design that runs the API and vision code. No AWS identity, secret, or CLI is configured here; the available Docker builder is amd64-only, so no ARM64 image was built, stack deployed, or endpoint created. | `BLOCKED` |
 | Technical report | `docs/TECHNICAL_REPORT.md` describes implemented behavior and the disjoint 120-image synthetic test results. | `VERIFIED COMPLETE` locally; synthetic-only evidence |
 | Judge-accessible code | The public repository `zalkabsi/Qyvoriq` is populated on `main`; the remote tree was checked against all 72 source, documentation, test, and fixture files. | `VERIFIED COMPLETE` |
 | Reproducible setup and pinned dependencies | `requirements.txt`, `requirements-dev.txt`, `frontend/package-lock.json`, Dockerfile, test instructions, CI workflow, passing Python/Node dependency audits. | `VERIFIED COMPLETE` locally after build and tests |

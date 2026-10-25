@@ -7,6 +7,7 @@ The template is prepared, but no AWS deployment was attempted. The managed envir
 ## Prerequisites
 
 - An AWS account and an authorized deployment role with permissions for ECR, ECS, EC2 security groups, ELBv2, IAM, CloudWatch Logs, and Secrets Manager.
+- A Docker Buildx builder that supports `linux/arm64` (an Arm host or a builder configured for cross-architecture execution). The workspace builder used for the local container check advertises only `linux/amd64`.
 - A VPC with at least two public subnets in different availability zones and routes through an Internet Gateway. This template assigns public IPs to Fargate tasks; the task security group only accepts API traffic from the ALB.
 - A domain/DNS record and ACM certificate for that domain in the same region as the ALB.
 - AWS CLI v2, Docker Buildx, Python 3 (to resolve a configured host proxy during image builds), and a Secrets Manager secret whose `SecretString` is the API bearer token.
