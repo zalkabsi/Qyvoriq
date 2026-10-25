@@ -1,0 +1,27 @@
+name: AWS identity setup check
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/identity-check.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  subject:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print only the non-secret AWS trust subject
+        shell: python
+        run: |
+          import base64, json, os, urllib.request
+          request = urllib.request.Request(
+              os.environ['ACTIONS_ID_TOKEN_REQUEST_URL'] + '&audience=sts.amazonaws.com',
+              headers={'Authorization': 'Bearer ' + os.environ['ACTIONS_ID_TOKEN_REQUEST_TOKEN']},
+          )
+          with urllib.request.urlopen(request) as response:
+              token = json.load(response)['value']
+          encoded = token.split('.')[1]
+          claims = json.loads(base64.urlsafe_b64decode(encoded + '=' * (-len(encoded) % 4)))
+          for key in ('iss', 'aud', 'sub', 'repository_id', 'repository_owner_id'):
+              print(key + ': ' + str(claims.get(key)))
