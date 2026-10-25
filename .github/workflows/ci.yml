@@ -22,7 +22,7 @@ jobs:
       - run: python -m pip install -r requirements-dev.txt
       - run: python -m pytest -q
       - run: ruff check backend benchmarks examples scripts tests
-      - run: cfn-lint deploy/ecr.yaml deploy/service.yaml
+      - run: cfn-lint deploy/*.yaml
       - run: pip-audit -r requirements-dev.txt
 
   frontend:

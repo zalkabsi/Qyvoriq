@@ -1,0 +1,120 @@
+name: Deploy AWS judge demo
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - deploy/aws-config.json
+      - deploy/express.yaml
+      - .github/workflows/deploy-aws.yml
+      - Dockerfile
+      - requirements.txt
+      - backend/**
+      - frontend/**
+      - scripts/smoke_deployment.py
+permissions:
+  contents: read
+concurrency:
+  group: qyvoriq-aws-demo
+  cancel-in-progress: false
+jobs:
+  config:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.config.outputs.enabled }}
+      region: ${{ steps.config.outputs.region }}
+      role: ${{ steps.config.outputs.role }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: config
+        shell: python
+        run: |
+          import json, os, re
+          config = json.load(open('deploy/aws-config.json'))
+          enabled = config.get('enabled') is True
+          region = config.get('region', '')
+          role = config.get('role_arn', '')
+          assert config.get('bootstrap_stack') == 'qyvoriq-access'
+          if enabled:
+              assert re.fullmatch(r'[a-z]{2}-[a-z]+-\d', region)
+              assert re.fullmatch(r'arn:aws:iam::\d{12}:role/qyvoriq-github-deploy', role)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
+              stream.write(f'enabled={str(enabled).lower()}\nregion={region}\nrole={role}\n')
+          print('AWS deployment enabled:', enabled)
+  deploy:
+    needs: config
+    if: needs.config.outputs.enabled == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: ${{ needs.config.outputs.region }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          role-to-assume: ${{ needs.config.outputs.role }}
+          aws-region: ${{ needs.config.outputs.region }}
+          role-session-name: qyvoriq-demo-${{ github.run_id }}
+          role-duration-seconds: 3600
+          mask-aws-account-id: true
+      - name: Read bootstrap and check default public networking
+        run: |
+          aws cloudformation describe-stacks --stack-name qyvoriq-access --query 'Stacks[0].Outputs' --output json > /tmp/qyvoriq-bootstrap.json
+          python - <<'PY'
+          import json, os
+          values = {entry['OutputKey']: entry['OutputValue'] for entry in json.load(open('/tmp/qyvoriq-bootstrap.json'))}
+          with open(os.environ['GITHUB_ENV'], 'a') as stream:
+              for name in ('RepositoryUri', 'ClusterArn', 'ExecutionRoleArn', 'InfrastructureRoleArn', 'ApiTokenSecretArn', 'ApiLogGroupName'):
+                  stream.write(f'{name}={values[name]}\n')
+          PY
+          default_vpc=$(aws ec2 describe-vpcs --filters Name=is-default,Values=true --query 'Vpcs[0].VpcId' --output text)
+          if [ "$default_vpc" = None ] || [ -z "$default_vpc" ]; then
+            echo 'A default VPC with public subnets is required. Choose/create networking in the AWS account before retrying.' >&2
+            exit 1
+          fi
+      - name: Build and push the tested x86 container
+        run: |
+          registry="${RepositoryUri%%/*}"
+          aws ecr get-login-password | docker login --username AWS --password-stdin "$registry"
+          if ! aws ecr describe-images --repository-name qyvoriq-demo --image-ids imageTag="$GITHUB_SHA" >/dev/null 2>&1; then
+            docker build --build-arg QYVORIQ_REVISION="$GITHUB_SHA" --tag "$RepositoryUri:$GITHUB_SHA" .
+            docker push "$RepositoryUri:$GITHUB_SHA"
+          fi
+          digest=$(aws ecr describe-images --repository-name qyvoriq-demo --image-ids imageTag="$GITHUB_SHA" --query 'imageDetails[0].imageDigest' --output text)
+          echo "ImageDigest=$digest" >> "$GITHUB_ENV"
+      - name: Deploy one ECS Express Mode service
+        run: |
+          aws cloudformation deploy --template-file deploy/express.yaml --stack-name qyvoriq-demo \
+            --no-fail-on-empty-changeset \
+            --parameter-overrides ImageUri="$RepositoryUri@$ImageDigest" ClusterArn="$ClusterArn" \
+              ExecutionRoleArn="$ExecutionRoleArn" InfrastructureRoleArn="$InfrastructureRoleArn" \
+              ApiTokenSecretArn="$ApiTokenSecretArn" ApiLogGroupName="$ApiLogGroupName"
+          aws cloudformation describe-stacks --stack-name qyvoriq-demo --query 'Stacks[0].Outputs' --output json > /tmp/qyvoriq-service.json
+          python - <<'PY'
+          import json, os
+          values = {entry['OutputKey']: entry['OutputValue'] for entry in json.load(open('/tmp/qyvoriq-service.json'))}
+          url = values['Endpoint']
+          if not url.startswith('https://'):
+              url = 'https://' + url
+          with open(os.environ['GITHUB_ENV'], 'a') as stream:
+              stream.write(f"DemoUrl={url}\nServiceArn={values['ServiceArn']}\n")
+          PY
+      - name: Verify the actual deployed application
+        run: |
+          token=$(aws secretsmanager get-secret-value --secret-id "$ApiTokenSecretArn" --query SecretString --output text)
+          echo "::add-mask::$token"
+          export QYVORIQ_API_TOKEN="$token"
+          python -m scripts.smoke_deployment --url "$DemoUrl" --output artifacts/deployment-evidence.json \
+            --region "$AWS_REGION" --image-uri "$RepositoryUri@$ImageDigest" --image-digest "$ImageDigest" \
+            --revision "$GITHUB_SHA" --service-arn "$ServiceArn"
+          printf 'Judge demo: %s\n' "$DemoUrl" >> "$GITHUB_STEP_SUMMARY"
+          printf 'Source revision: %s\n' "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qyvoriq-deployment-evidence
+          path: artifacts/deployment-evidence.json
+          if-no-files-found: error
+          retention-days: 30

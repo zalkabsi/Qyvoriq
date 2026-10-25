@@ -1,0 +1,6 @@
+{
+  "enabled": false,
+  "region": "us-west-2",
+  "role_arn": "",
+  "bootstrap_stack": "qyvoriq-access"
+}

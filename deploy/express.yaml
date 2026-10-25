@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Qyvoriq judge demo on ECS Express Mode with a managed HTTPS endpoint. Standard x86 OpenCV; no COOL claim.
+Parameters:
+  ImageUri:
+    Type: String
+  ClusterArn:
+    Type: String
+  ExecutionRoleArn:
+    Type: String
+  InfrastructureRoleArn:
+    Type: String
+  ApiTokenSecretArn:
+    Type: String
+  ApiLogGroupName:
+    Type: String
+Resources:
+  DemoService:
+    Type: AWS::ECS::ExpressGatewayService
+    Properties:
+      ServiceName: qyvoriq-demo
+      Cluster: !Ref ClusterArn
+      InfrastructureRoleArn: !Ref InfrastructureRoleArn
+      ExecutionRoleArn: !Ref ExecutionRoleArn
+      Cpu: '1024'
+      Memory: '2048'
+      HealthCheckPath: /api/health/ready
+      ScalingTarget:
+        MinTaskCount: 1
+        MaxTaskCount: 1
+      PrimaryContainer:
+        Image: !Ref ImageUri
+        ContainerPort: 8080
+        AwsLogsConfiguration:
+          LogGroup: !Ref ApiLogGroupName
+          LogStreamPrefix: api
+        Environment:
+          - Name: QYVORIQ_ENV
+            Value: production
+          - Name: QYVORIQ_ALLOWED_ORIGINS
+            Value: ''
+        Secrets:
+          - Name: QYVORIQ_API_TOKEN
+            ValueFrom: !Ref ApiTokenSecretArn
+Outputs:
+  Endpoint:
+    Value: !GetAtt DemoService.Endpoint
+  ServiceArn:
+    Value: !GetAtt DemoService.ServiceArn

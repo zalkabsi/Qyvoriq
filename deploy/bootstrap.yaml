@@ -1,0 +1,194 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: One-time Qyvoriq GitHub OIDC access, ECR, ECS cluster, secret and runtime roles. Review in your own AWS account.
+Parameters:
+  ExistingOidcProviderArn:
+    Type: String
+    Default: ''
+    Description: Existing GitHub OIDC provider ARN, or empty to create one.
+  GitHubSubject:
+    Type: String
+    Description: Exact subject printed by the repository's identity-check workflow.
+    AllowedPattern: 'repo:zalkabsi(@33527527)?/Qyvoriq(@1433011922)?:ref:refs/heads/main'
+Conditions:
+  CreateOidcProvider: !Equals [!Ref ExistingOidcProviderArn, '']
+Resources:
+  GitHubProvider:
+    Type: AWS::IAM::OIDCProvider
+    Condition: CreateOidcProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList: [sts.amazonaws.com]
+  Repository:
+    Type: AWS::ECR::Repository
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      RepositoryName: qyvoriq-demo
+      ImageTagMutability: IMMUTABLE
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      EncryptionConfiguration:
+        EncryptionType: AES256
+      LifecyclePolicy:
+        LifecyclePolicyText: '{"rules":[{"rulePriority":1,"description":"Remove untagged images after 7 days","selection":{"tagStatus":"untagged","countType":"sinceImagePushed","countUnit":"days","countNumber":7},"action":{"type":"expire"}}]}'
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: qyvoriq-demo
+  ApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /qyvoriq/demo/api
+      RetentionInDays: 7
+  ApiToken:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: qyvoriq/demo/api-token
+      Description: Shared judge token. Never put its value into source, logs or the video.
+      GenerateSecretString:
+        PasswordLength: 48
+        ExcludePunctuation: true
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: qyvoriq-demo-execution
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: QyvoriqContainerAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: '*'
+              - Effect: Allow
+                Action: [ecr:BatchCheckLayerAvailability, ecr:BatchGetImage, ecr:GetDownloadUrlForLayer]
+                Resource: !GetAtt Repository.Arn
+              - Effect: Allow
+                Action: [logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !GetAtt ApiLogGroup.Arn
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref ApiToken
+  InfrastructureRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: qyvoriq-demo-infrastructure
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonECSInfrastructureRoleforExpressGatewayServices
+  GitHubDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: qyvoriq-github-deploy
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !If [CreateOidcProvider, !Ref GitHubProvider, !Ref ExistingOidcProviderArn]
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Ref GitHubSubject
+      Policies:
+        - PolicyName: DeployQyvoriqDemo
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: ProjectCloudFormation
+                Effect: Allow
+                Action: [cloudformation:CreateStack, cloudformation:UpdateStack, cloudformation:DeleteStack, cloudformation:DescribeStacks, cloudformation:DescribeStackEvents, cloudformation:DescribeStackResources, cloudformation:ListStackResources, cloudformation:GetTemplate, cloudformation:CreateChangeSet, cloudformation:DescribeChangeSet, cloudformation:ExecuteChangeSet, cloudformation:DeleteChangeSet]
+                Resource: !Sub arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/qyvoriq-demo/*
+              - Sid: ReadBootstrapOutputs
+                Effect: Allow
+                Action: cloudformation:DescribeStacks
+                Resource: !Sub arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/qyvoriq-access/*
+              - Sid: TemplateChecks
+                Effect: Allow
+                Action: [cloudformation:ValidateTemplate, cloudformation:GetTemplateSummary]
+                Resource: '*'
+              - Sid: ProjectService
+                Effect: Allow
+                Action: [ecs:CreateExpressGatewayService, ecs:DescribeExpressGatewayService, ecs:UpdateExpressGatewayService, ecs:DeleteExpressGatewayService, ecs:DescribeServices]
+                Resource: !Sub arn:${AWS::Partition}:ecs:${AWS::Region}:${AWS::AccountId}:service/qyvoriq-demo/qyvoriq-demo
+              - Sid: ProjectCluster
+                Effect: Allow
+                Action: [ecs:CreateCluster, ecs:DescribeClusters]
+                Resource: !GetAtt Cluster.Arn
+              - Sid: ExpressGatewayOperations
+                Effect: Allow
+                Action: [ecs:CreateGateway, ecs:DescribeGateway, ecs:AssociateGatewayWithCluster, ecs:DeleteGateway]
+                Resource: !Sub arn:${AWS::Partition}:ecs:${AWS::Region}:${AWS::AccountId}:gateway/*
+              - Sid: ExpressRequiredOperations
+                Effect: Allow
+                Action: [ecs:RegisterTaskDefinition, ecs:DescribeTaskDefinition, ecs:DeregisterTaskDefinition, ecs:ListTagsForResource, ecs:TagResource, ecs:UntagResource]
+                Resource: '*'
+                Condition:
+                  StringEquals:
+                    aws:RequestedRegion: !Ref AWS::Region
+              - Sid: PassProjectRolesOnly
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: [!GetAtt ExecutionRole.Arn, !GetAtt InfrastructureRole.Arn]
+                Condition:
+                  StringEquals:
+                    iam:PassedToService: [ecs.amazonaws.com, ecs-tasks.amazonaws.com]
+              - Sid: EcrAuthentication
+                Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: '*'
+              - Sid: PushProjectImages
+                Effect: Allow
+                Action: [ecr:BatchCheckLayerAvailability, ecr:InitiateLayerUpload, ecr:UploadLayerPart, ecr:CompleteLayerUpload, ecr:PutImage, ecr:DescribeImages, ecr:BatchGetImage]
+                Resource: !GetAtt Repository.Arn
+              - Sid: DemoTestToken
+                Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref ApiToken
+              - Sid: ReadProjectLogs
+                Effect: Allow
+                Action: [logs:GetLogEvents, logs:FilterLogEvents]
+                Resource: !GetAtt ApiLogGroup.Arn
+              - Sid: NetworkPreflight
+                Effect: Allow
+                Action: [ec2:DescribeVpcs, ec2:DescribeSubnets, ec2:DescribeSecurityGroups]
+                Resource: '*'
+              - Sid: RequiredEcsServiceLinkedRole
+                Effect: Allow
+                Action: iam:CreateServiceLinkedRole
+                Resource: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS
+                Condition:
+                  StringEquals:
+                    iam:AWSServiceName: ecs.amazonaws.com
+Outputs:
+  OidcProviderArn:
+    Value: !If [CreateOidcProvider, !Ref GitHubProvider, !Ref ExistingOidcProviderArn]
+  DeploymentRoleArn:
+    Value: !GetAtt GitHubDeployRole.Arn
+  RepositoryUri:
+    Value: !GetAtt Repository.RepositoryUri
+  ClusterArn:
+    Value: !GetAtt Cluster.Arn
+  ExecutionRoleArn:
+    Value: !GetAtt ExecutionRole.Arn
+  InfrastructureRoleArn:
+    Value: !GetAtt InfrastructureRole.Arn
+  ApiTokenSecretArn:
+    Value: !Ref ApiToken
+  ApiLogGroupName:
+    Value: !Ref ApiLogGroup
