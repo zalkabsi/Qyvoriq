@@ -1,0 +1,216 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Qyvoriq single-task ARM64 vision API behind an HTTPS ALB.
+Parameters:
+  ImageUri:
+    Type: String
+    Description: Full private ECR image URI with an immutable tag.
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  VpcCidr:
+    Type: String
+    Description: CIDR of the selected VPC, used to limit ALB egress to application traffic.
+  PublicSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: At least two public subnets in different availability zones, with a route to an Internet Gateway.
+  CertificateArn:
+    Type: String
+    Description: ACM certificate for the custom DNS name that will point to the ALB.
+  ApiTokenSecretArn:
+    Type: String
+    Description: Secrets Manager secret containing the bearer token as SecretString.
+  DesiredCount:
+    Type: Number
+    Default: 1
+    MinValue: 1
+    MaxValue: 1
+    Description: One task is required because inspection state is process-local and ephemeral.
+Resources:
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /qyvoriq/api
+      RetentionInDays: 7
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: HTTPS ingress for Qyvoriq.
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: !Ref VpcCidr
+  TaskSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow API traffic only from the ALB.
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          SourceSecurityGroupId: !GetAtt LoadBalancerSecurityGroup.GroupId
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: qyvoriq-api
+      Scheme: internet-facing
+      Type: application
+      IpAddressType: ipv4
+      Subnets: !Ref PublicSubnetIds
+      SecurityGroups:
+        - !GetAtt LoadBalancerSecurityGroup.GroupId
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: qyvoriq-api
+      VpcId: !Ref VpcId
+      TargetType: ip
+      Protocol: HTTP
+      Port: 8080
+      HealthCheckEnabled: true
+      HealthCheckPath: /api/health/ready
+      HealthCheckProtocol: HTTP
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+      Matcher:
+        HttpCode: '200'
+      TargetGroupAttributes:
+        - Key: stickiness.enabled
+          Value: 'true'
+        - Key: stickiness.type
+          Value: lb_cookie
+        - Key: stickiness.lb_cookie.duration_seconds
+          Value: '1800'
+  HttpsListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref CertificateArn
+      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: qyvoriq
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: ReadQyvoriqApiToken
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref ApiTokenSecretArn
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: qyvoriq-api
+      Cpu: '1024'
+      Memory: '2048'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      RuntimePlatform:
+        OperatingSystemFamily: LINUX
+        CpuArchitecture: ARM64
+      ExecutionRoleArn: !GetAtt ExecutionRole.Arn
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      ContainerDefinitions:
+        - Name: qyvoriq-api
+          Image: !Ref ImageUri
+          Essential: true
+          PortMappings:
+            - ContainerPort: 8080
+              Protocol: tcp
+          Environment:
+            - Name: QYVORIQ_ENV
+              Value: production
+            - Name: LOG_LEVEL
+              Value: INFO
+            - Name: QYVORIQ_ALLOWED_ORIGINS
+              Value: ''
+          Secrets:
+            - Name: QYVORIQ_API_TOKEN
+              ValueFrom: !Ref ApiTokenSecretArn
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health/ready', timeout=2)" || exit 1
+            Interval: 30
+            Timeout: 3
+            Retries: 3
+            StartPeriod: 60
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: api
+  Service:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - HttpsListener
+    Properties:
+      ServiceName: qyvoriq-api
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TaskDefinition
+      DesiredCount: !Ref DesiredCount
+      LaunchType: FARGATE
+      PlatformVersion: LATEST
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      HealthCheckGracePeriodSeconds: 120
+      EnableExecuteCommand: false
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets: !Ref PublicSubnetIds
+          SecurityGroups:
+            - !GetAtt TaskSecurityGroup.GroupId
+      LoadBalancers:
+        - ContainerName: qyvoriq-api
+          ContainerPort: 8080
+          TargetGroupArn: !Ref TargetGroup
+Outputs:
+  LoadBalancerDnsName:
+    Description: Configure an HTTPS DNS name and ACM certificate for this ALB.
+    Value: !GetAtt ApplicationLoadBalancer.DNSName
+  ServiceName:
+    Value: !Ref Service

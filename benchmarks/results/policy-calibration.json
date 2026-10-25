@@ -1,0 +1,15 @@
+{
+  "policy_id": "synthetic-validation-v1",
+  "max_disagreement_pct_fs": 0.924,
+  "fit_method": "95th percentile (higher quantile) of raw estimator disagreement among quality-usable, in-range validation pairs with fixed-mean absolute error <= 2% of full-scale span",
+  "target_retained_coverage": 0.95,
+  "validation_source": "benchmarks/results/validation.json",
+  "validation_samples_total": 120,
+  "validation_eligible_pairs": 60,
+  "validation_retained_pairs": 58,
+  "validation_retained_fraction": 0.9667,
+  "validation_pairs_over_5pct_fs": 0,
+  "validation_false_accept_count_over_5pct_fs": 0,
+  "caveat": "Fit only to generated synthetic scenes. This threshold has no established calibration on SyncG or real photographs.",
+  "calibrated_at": "2026-10-25T09:58:46+00:00"
+}

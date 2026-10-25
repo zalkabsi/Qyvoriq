@@ -1,0 +1,2447 @@
+{
+  "schema_version": 1,
+  "dataset": "Qyvoriq controlled synthetic gauge scenes",
+  "dataset_type": "synthetic_only",
+  "license": "CC0-1.0 for generated sample images; generator is covered by repository MIT license.",
+  "split": "test",
+  "split_policy": "Disjoint deterministic seed ranges for train, validation, and test; the algorithm does not train on these images.",
+  "samples": 120,
+  "seed": 22026,
+  "opencv_version": "5.0.0",
+  "calibration": {
+    "minimum_value": 0.0,
+    "maximum_value": 100.0,
+    "units": "psi",
+    "start_angle_deg": 135.0,
+    "end_angle_deg": 45.0,
+    "sweep_direction": "clockwise",
+    "instrument_id": null
+  },
+  "policy": {
+    "max_disagreement_pct_fs": 0.924,
+    "false_accept_definition": "accepted reading with absolute error greater than 5% of full-scale span"
+  },
+  "runtime": {
+    "total_seconds": 13.84
+  },
+  "summary": {
+    "baseline_a_geometric": {
+      "predicted_count": 109,
+      "coverage": 0.9083,
+      "mae_fs_pct": 0.5849,
+      "median_abs_error_fs_pct": 0.5675,
+      "p95_abs_error_fs_pct": 0.7683,
+      "accuracy_within_1pct_fs": 0.9908,
+      "accuracy_within_2pct_fs": 1.0,
+      "accuracy_within_5pct_fs": 1.0,
+      "false_accept_rate_over_5pct_fs": 0.0,
+      "mean_latency_ms": 31.23,
+      "p95_latency_ms": 52.57,
+      "throughput_images_per_second": 32.021
+    },
+    "baseline_b_fixed_mean": {
+      "predicted_count": 109,
+      "coverage": 0.9083,
+      "mae_fs_pct": 0.2863,
+      "median_abs_error_fs_pct": 0.2881,
+      "p95_abs_error_fs_pct": 0.4619,
+      "accuracy_within_1pct_fs": 1.0,
+      "accuracy_within_2pct_fs": 1.0,
+      "accuracy_within_5pct_fs": 1.0,
+      "false_accept_rate_over_5pct_fs": 0.0,
+      "mean_latency_ms": 32.497,
+      "p95_latency_ms": 54.069,
+      "throughput_images_per_second": 30.772
+    },
+    "qyvoriq_selective": {
+      "predicted_count": 59,
+      "coverage": 0.4917,
+      "mae_fs_pct": 0.2793,
+      "median_abs_error_fs_pct": 0.2869,
+      "p95_abs_error_fs_pct": 0.4161,
+      "accuracy_within_1pct_fs": 1.0,
+      "accuracy_within_2pct_fs": 1.0,
+      "accuracy_within_5pct_fs": 1.0,
+      "false_accept_rate_over_5pct_fs": 0.0,
+      "mean_latency_ms": 63.332,
+      "p95_latency_ms": 97.995,
+      "throughput_images_per_second": 15.79
+    }
+  },
+  "selective_risk_curve_fixed_mean": [
+    {
+      "disagreement_threshold_pct_fs": 1.0,
+      "accepted_count": 58,
+      "coverage": 0.4833,
+      "selective_mae_pct_fs": 0.2773,
+      "false_accept_rate_over_5pct_fs": 0.0
+    },
+    {
+      "disagreement_threshold_pct_fs": 2.0,
+      "accepted_count": 58,
+      "coverage": 0.4833,
+      "selective_mae_pct_fs": 0.2773,
+      "false_accept_rate_over_5pct_fs": 0.0
+    },
+    {
+      "disagreement_threshold_pct_fs": 0.924,
+      "accepted_count": 57,
+      "coverage": 0.475,
+      "selective_mae_pct_fs": 0.2776,
+      "false_accept_rate_over_5pct_fs": 0.0
+    },
+    {
+      "disagreement_threshold_pct_fs": 5.0,
+      "accepted_count": 58,
+      "coverage": 0.4833,
+      "selective_mae_pct_fs": 0.2773,
+      "false_accept_rate_over_5pct_fs": 0.0
+    },
+    {
+      "disagreement_threshold_pct_fs": 7.5,
+      "accepted_count": 58,
+      "coverage": 0.4833,
+      "selective_mae_pct_fs": 0.2773,
+      "false_accept_rate_over_5pct_fs": 0.0
+    },
+    {
+      "disagreement_threshold_pct_fs": 10.0,
+      "accepted_count": 58,
+      "coverage": 0.4833,
+      "selective_mae_pct_fs": 0.2773,
+      "false_accept_rate_over_5pct_fs": 0.0
+    },
+    {
+      "disagreement_threshold_pct_fs": 100.0,
+      "accepted_count": 58,
+      "coverage": 0.4833,
+      "selective_mae_pct_fs": 0.2773,
+      "false_accept_rate_over_5pct_fs": 0.0
+    }
+  ],
+  "failure_rate_by_condition": {
+    "clear": {
+      "sample_count": 30,
+      "verified_count": 30,
+      "reinspection_required_count": 0,
+      "human_review_count": 0,
+      "unsupported_count": 0,
+      "agent_abstention_rate": 0.0,
+      "agent_selective_mae_pct_fs": 0.3087
+    },
+    "glare": {
+      "sample_count": 30,
+      "verified_count": 0,
+      "reinspection_required_count": 30,
+      "human_review_count": 0,
+      "unsupported_count": 0,
+      "agent_abstention_rate": 1.0,
+      "agent_selective_mae_pct_fs": null
+    },
+    "blur": {
+      "sample_count": 30,
+      "verified_count": 0,
+      "reinspection_required_count": 30,
+      "human_review_count": 0,
+      "unsupported_count": 0,
+      "agent_abstention_rate": 1.0,
+      "agent_selective_mae_pct_fs": null
+    },
+    "noise": {
+      "sample_count": 30,
+      "verified_count": 29,
+      "reinspection_required_count": 1,
+      "human_review_count": 0,
+      "unsupported_count": 0,
+      "agent_abstention_rate": 0.0333,
+      "agent_selective_mae_pct_fs": 0.2489
+    }
+  },
+  "agent_state_counts": {
+    "VERIFIED": 59,
+    "REINSPECTION_REQUIRED": 61
+  },
+  "rows": [
+    {
+      "index": 0,
+      "seed": 22026,
+      "condition": "clear",
+      "ground_truth": 63.408958,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 62.73931175560321,
+        "polar": 63.33333333333333
+      },
+      "predictions": {
+        "baseline_a_geometric": 62.739312,
+        "baseline_b_fixed_mean": 63.036323,
+        "qyvoriq_selective": 63.0363
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.594
+    },
+    {
+      "index": 1,
+      "seed": 22027,
+      "condition": "glare",
+      "ground_truth": 58.160426,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 57.74369381510627,
+        "polar": 58.14814814814815
+      },
+      "predictions": {
+        "baseline_a_geometric": 57.743694,
+        "baseline_b_fixed_mean": 57.945921,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.4045
+    },
+    {
+      "index": 2,
+      "seed": 22028,
+      "condition": "blur",
+      "ground_truth": 51.696633,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 50.67344554238957,
+        "polar": 51.48148148148148
+      },
+      "predictions": {
+        "baseline_a_geometric": 50.673446,
+        "baseline_b_fixed_mean": 51.077464,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.808
+    },
+    {
+      "index": 3,
+      "seed": 22029,
+      "condition": "noise",
+      "ground_truth": 8.48003,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 7.949217009155486,
+        "polar": 8.518518518518519
+      },
+      "predictions": {
+        "baseline_a_geometric": 7.949217,
+        "baseline_b_fixed_mean": 8.233868,
+        "qyvoriq_selective": 8.23385
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5693
+    },
+    {
+      "index": 4,
+      "seed": 22030,
+      "condition": "clear",
+      "ground_truth": 86.572689,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 87.22477618493811,
+        "polar": 86.66666666666667
+      },
+      "predictions": {
+        "baseline_a_geometric": 87.224776,
+        "baseline_b_fixed_mean": 86.945721,
+        "qyvoriq_selective": 86.94575
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5581
+    },
+    {
+      "index": 5,
+      "seed": 22031,
+      "condition": "glare",
+      "ground_truth": 89.951937,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 90.71603062399205,
+        "polar": 90.0
+      },
+      "predictions": {
+        "baseline_a_geometric": 90.716031,
+        "baseline_b_fixed_mean": 90.358015,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.716
+    },
+    {
+      "index": 6,
+      "seed": 22032,
+      "condition": "blur",
+      "ground_truth": 42.427669,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 41.76230716583838,
+        "polar": 42.592592592592595
+      },
+      "predictions": {
+        "baseline_a_geometric": 41.762307,
+        "baseline_b_fixed_mean": 42.17745,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.8303
+    },
+    {
+      "index": 7,
+      "seed": 22033,
+      "condition": "noise",
+      "ground_truth": 49.302675,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 49.804872257972086,
+        "polar": 49.25925925925926
+      },
+      "predictions": {
+        "baseline_a_geometric": 49.804872,
+        "baseline_b_fixed_mean": 49.532066,
+        "qyvoriq_selective": 49.5321
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5456
+    },
+    {
+      "index": 8,
+      "seed": 22034,
+      "condition": "clear",
+      "ground_truth": 71.362631,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 71.97247049220272,
+        "polar": 71.48148148148148
+      },
+      "predictions": {
+        "baseline_a_geometric": 71.97247,
+        "baseline_b_fixed_mean": 71.726976,
+        "qyvoriq_selective": 71.727
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.491
+    },
+    {
+      "index": 9,
+      "seed": 22035,
+      "condition": "glare",
+      "ground_truth": 92.04203,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 91.33416151261997,
+        "polar": 91.85185185185185
+      },
+      "predictions": {
+        "baseline_a_geometric": 91.334162,
+        "baseline_b_fixed_mean": 91.593007,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5177
+    },
+    {
+      "index": 10,
+      "seed": 22036,
+      "condition": "blur",
+      "ground_truth": 48.057888,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 48.78107222837242,
+        "polar": 48.148148148148145
+      },
+      "predictions": {
+        "baseline_a_geometric": 48.781072,
+        "baseline_b_fixed_mean": 48.46461,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.6329
+    },
+    {
+      "index": 11,
+      "seed": 22037,
+      "condition": "noise",
+      "ground_truth": 17.069373,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": false,
+      "raw_estimator_readings": {
+        "geometric": null,
+        "polar": 17.037037037037038
+      },
+      "predictions": {
+        "baseline_a_geometric": null,
+        "baseline_b_fixed_mean": null,
+        "qyvoriq_selective": 17.3819
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": null
+    },
+    {
+      "index": 12,
+      "seed": 22038,
+      "condition": "clear",
+      "ground_truth": 51.624047,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 52.314211727791935,
+        "polar": 51.48148148148148
+      },
+      "predictions": {
+        "baseline_a_geometric": 52.314212,
+        "baseline_b_fixed_mean": 51.897847,
+        "qyvoriq_selective": 51.89785
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.8327
+    },
+    {
+      "index": 13,
+      "seed": 22039,
+      "condition": "glare",
+      "ground_truth": 20.650266,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": false,
+      "raw_estimator_readings": {
+        "geometric": null,
+        "polar": 20.74074074074074
+      },
+      "predictions": {
+        "baseline_a_geometric": null,
+        "baseline_b_fixed_mean": null,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": null
+    },
+    {
+      "index": 14,
+      "seed": 22040,
+      "condition": "blur",
+      "ground_truth": 93.863873,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 94.517582370727,
+        "polar": 93.7037037037037
+      },
+      "predictions": {
+        "baseline_a_geometric": 94.517582,
+        "baseline_b_fixed_mean": 94.110643,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.8139
+    },
+    {
+      "index": 15,
+      "seed": 22041,
+      "condition": "noise",
+      "ground_truth": 78.17914,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 77.73319639600551,
+        "polar": 78.51851851851852
+      },
+      "predictions": {
+        "baseline_a_geometric": 77.733196,
+        "baseline_b_fixed_mean": 78.125857,
+        "qyvoriq_selective": 78.12585
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.7853
+    },
+    {
+      "index": 16,
+      "seed": 22042,
+      "condition": "clear",
+      "ground_truth": 10.084099,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 10.5923112344755,
+        "polar": 10.0
+      },
+      "predictions": {
+        "baseline_a_geometric": 10.592311,
+        "baseline_b_fixed_mean": 10.296156,
+        "qyvoriq_selective": 10.29615
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5923
+    },
+    {
+      "index": 17,
+      "seed": 22043,
+      "condition": "glare",
+      "ground_truth": 63.880894,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 63.41285232670941,
+        "polar": 64.07407407407408
+      },
+      "predictions": {
+        "baseline_a_geometric": 63.412852,
+        "baseline_b_fixed_mean": 63.743463,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.6612
+    },
+    {
+      "index": 18,
+      "seed": 22044,
+      "condition": "blur",
+      "ground_truth": 66.555135,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 67.1831370163059,
+        "polar": 66.66666666666666
+      },
+      "predictions": {
+        "baseline_a_geometric": 67.183137,
+        "baseline_b_fixed_mean": 66.924902,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5165
+    },
+    {
+      "index": 19,
+      "seed": 22045,
+      "condition": "noise",
+      "ground_truth": 56.36339,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 55.82169368108924,
+        "polar": 56.2962962962963
+      },
+      "predictions": {
+        "baseline_a_geometric": 55.821694,
+        "baseline_b_fixed_mean": 56.058995,
+        "qyvoriq_selective": 56.059
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.4746
+    },
+    {
+      "index": 20,
+      "seed": 22046,
+      "condition": "clear",
+      "ground_truth": 9.560273,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 8.96514260907272,
+        "polar": 9.62962962962963
+      },
+      "predictions": {
+        "baseline_a_geometric": 8.965143,
+        "baseline_b_fixed_mean": 9.297386,
+        "qyvoriq_selective": 9.29735
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.6645
+    },
+    {
+      "index": 21,
+      "seed": 22047,
+      "condition": "glare",
+      "ground_truth": 57.026674,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 56.48590295619914,
+        "polar": 57.03703703703704
+      },
+      "predictions": {
+        "baseline_a_geometric": 56.485903,
+        "baseline_b_fixed_mean": 56.76147,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5511
+    },
+    {
+      "index": 22,
+      "seed": 22048,
+      "condition": "blur",
+      "ground_truth": 51.908485,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 52.59306205833161,
+        "polar": 51.85185185185185
+      },
+      "predictions": {
+        "baseline_a_geometric": 52.593062,
+        "baseline_b_fixed_mean": 52.222457,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.7412
+    },
+    {
+      "index": 23,
+      "seed": 22049,
+      "condition": "noise",
+      "ground_truth": 69.645217,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 69.10375445524318,
+        "polar": 69.62962962962963
+      },
+      "predictions": {
+        "baseline_a_geometric": 69.103754,
+        "baseline_b_fixed_mean": 69.366692,
+        "qyvoriq_selective": 69.3667
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5259
+    },
+    {
+      "index": 24,
+      "seed": 22050,
+      "condition": "clear",
+      "ground_truth": 63.008782,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 62.48467753626387,
+        "polar": 62.96296296296296
+      },
+      "predictions": {
+        "baseline_a_geometric": 62.484678,
+        "baseline_b_fixed_mean": 62.72382,
+        "qyvoriq_selective": 62.72385
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.4783
+    },
+    {
+      "index": 25,
+      "seed": 22051,
+      "condition": "glare",
+      "ground_truth": 57.760501,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 58.396793934066984,
+        "polar": 57.77777777777777
+      },
+      "predictions": {
+        "baseline_a_geometric": 58.396794,
+        "baseline_b_fixed_mean": 58.087286,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.619
+    },
+    {
+      "index": 26,
+      "seed": 22052,
+      "condition": "blur",
+      "ground_truth": 36.657168,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 36.123913608833526,
+        "polar": 36.666666666666664
+      },
+      "predictions": {
+        "baseline_a_geometric": 36.123914,
+        "baseline_b_fixed_mean": 36.39529,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5428
+    },
+    {
+      "index": 27,
+      "seed": 22053,
+      "condition": "noise",
+      "ground_truth": 29.242047,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 28.605201219938692,
+        "polar": 29.259259259259256
+      },
+      "predictions": {
+        "baseline_a_geometric": 28.605201,
+        "baseline_b_fixed_mean": 28.93223,
+        "qyvoriq_selective": 28.93225
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.6541
+    },
+    {
+      "index": 28,
+      "seed": 22054,
+      "condition": "clear",
+      "ground_truth": 15.285874,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 15.829446891434085,
+        "polar": 15.185185185185185
+      },
+      "predictions": {
+        "baseline_a_geometric": 15.829447,
+        "baseline_b_fixed_mean": 15.507316,
+        "qyvoriq_selective": 15.5073
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.6443
+    },
+    {
+      "index": 29,
+      "seed": 22055,
+      "condition": "glare",
+      "ground_truth": 46.171195,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": false,
+      "raw_estimator_readings": {
+        "geometric": null,
+        "polar": 46.2962962962963
+      },
+      "predictions": {
+        "baseline_a_geometric": null,
+        "baseline_b_fixed_mean": null,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": null
+    },
+    {
+      "index": 30,
+      "seed": 22056,
+      "condition": "blur",
+      "ground_truth": 6.984062,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 6.4895149171143185,
+        "polar": 7.037037037037037
+      },
+      "predictions": {
+        "baseline_a_geometric": 6.489515,
+        "baseline_b_fixed_mean": 6.763276,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5475
+    },
+    {
+      "index": 31,
+      "seed": 22057,
+      "condition": "noise",
+      "ground_truth": 72.924028,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 72.39949458865415,
+        "polar": 72.96296296296296
+      },
+      "predictions": {
+        "baseline_a_geometric": 72.399495,
+        "baseline_b_fixed_mean": 72.681229,
+        "qyvoriq_selective": 72.68125
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5635
+    },
+    {
+      "index": 32,
+      "seed": 22058,
+      "condition": "clear",
+      "ground_truth": 42.942727,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 42.30656972204501,
+        "polar": 42.96296296296296
+      },
+      "predictions": {
+        "baseline_a_geometric": 42.30657,
+        "baseline_b_fixed_mean": 42.634766,
+        "qyvoriq_selective": 42.6348
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.6564
+    },
+    {
+      "index": 33,
+      "seed": 22059,
+      "condition": "glare",
+      "ground_truth": 18.44744,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": false,
+      "raw_estimator_readings": {
+        "geometric": null,
+        "polar": 18.51851851851852
+      },
+      "predictions": {
+        "baseline_a_geometric": null,
+        "baseline_b_fixed_mean": null,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": null
+    },
+    {
+      "index": 34,
+      "seed": 22060,
+      "condition": "blur",
+      "ground_truth": 53.047419,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 52.33889347229677,
+        "polar": 52.96296296296297
+      },
+      "predictions": {
+        "baseline_a_geometric": 52.338893,
+        "baseline_b_fixed_mean": 52.650928,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.6241
+    },
+    {
+      "index": 35,
+      "seed": 22061,
+      "condition": "noise",
+      "ground_truth": 8.615692,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 7.985208854283367,
+        "polar": 8.518518518518519
+      },
+      "predictions": {
+        "baseline_a_geometric": 7.985209,
+        "baseline_b_fixed_mean": 8.251864,
+        "qyvoriq_selective": 8.25185
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5333
+    },
+    {
+      "index": 36,
+      "seed": 22062,
+      "condition": "clear",
+      "ground_truth": 61.652499,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 62.32687143663879,
+        "polar": 61.48148148148148
+      },
+      "predictions": {
+        "baseline_a_geometric": 62.326871,
+        "baseline_b_fixed_mean": 61.904176,
+        "qyvoriq_selective": 61.9042
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.8454
+    },
+    {
+      "index": 37,
+      "seed": 22063,
+      "condition": "glare",
+      "ground_truth": 38.701068,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": false,
+      "raw_estimator_readings": {
+        "geometric": null,
+        "polar": 38.51851851851852
+      },
+      "predictions": {
+        "baseline_a_geometric": null,
+        "baseline_b_fixed_mean": null,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": null
+    },
+    {
+      "index": 38,
+      "seed": 22064,
+      "condition": "blur",
+      "ground_truth": 35.578687,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 35.055401633679445,
+        "polar": 35.55555555555556
+      },
+      "predictions": {
+        "baseline_a_geometric": 35.055402,
+        "baseline_b_fixed_mean": 35.305479,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5002
+    },
+    {
+      "index": 39,
+      "seed": 22065,
+      "condition": "noise",
+      "ground_truth": 73.370035,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 72.80828220036405,
+        "polar": 73.33333333333333
+      },
+      "predictions": {
+        "baseline_a_geometric": 72.808282,
+        "baseline_b_fixed_mean": 73.070808,
+        "qyvoriq_selective": 73.0708
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5251
+    },
+    {
+      "index": 40,
+      "seed": 22066,
+      "condition": "clear",
+      "ground_truth": 37.200635,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 37.723334876942225,
+        "polar": 37.407407407407405
+      },
+      "predictions": {
+        "baseline_a_geometric": 37.723335,
+        "baseline_b_fixed_mean": 37.565371,
+        "qyvoriq_selective": 37.56535
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.3159
+    },
+    {
+      "index": 41,
+      "seed": 22067,
+      "condition": "glare",
+      "ground_truth": 90.596088,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 91.11810797843512,
+        "polar": 90.37037037037037
+      },
+      "predictions": {
+        "baseline_a_geometric": 91.118108,
+        "baseline_b_fixed_mean": 90.744239,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.7477
+    },
+    {
+      "index": 42,
+      "seed": 22068,
+      "condition": "blur",
+      "ground_truth": 48.855714,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 49.50068677440771,
+        "polar": 48.888888888888886
+      },
+      "predictions": {
+        "baseline_a_geometric": 49.500687,
+        "baseline_b_fixed_mean": 49.194788,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.6118
+    },
+    {
+      "index": 43,
+      "seed": 22069,
+      "condition": "noise",
+      "ground_truth": 39.331911,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 38.76445059689099,
+        "polar": 39.62962962962963
+      },
+      "predictions": {
+        "baseline_a_geometric": 38.764451,
+        "baseline_b_fixed_mean": 39.19704,
+        "qyvoriq_selective": 39.19705
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.8652
+    },
+    {
+      "index": 44,
+      "seed": 22070,
+      "condition": "clear",
+      "ground_truth": 38.069284,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 38.666439328508,
+        "polar": 38.148148148148145
+      },
+      "predictions": {
+        "baseline_a_geometric": 38.666439,
+        "baseline_b_fixed_mean": 38.407294,
+        "qyvoriq_selective": 38.40725
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5183
+    },
+    {
+      "index": 45,
+      "seed": 22071,
+      "condition": "glare",
+      "ground_truth": 59.294536,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 58.790747463396286,
+        "polar": 59.25925925925925
+      },
+      "predictions": {
+        "baseline_a_geometric": 58.790747,
+        "baseline_b_fixed_mean": 59.025003,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.4685
+    },
+    {
+      "index": 46,
+      "seed": 22072,
+      "condition": "blur",
+      "ground_truth": 20.662481,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 21.64523984856922,
+        "polar": 20.74074074074074
+      },
+      "predictions": {
+        "baseline_a_geometric": 21.64524,
+        "baseline_b_fixed_mean": 21.19299,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.9045
+    },
+    {
+      "index": 47,
+      "seed": 22073,
+      "condition": "noise",
+      "ground_truth": 73.723984,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 73.13389967129777,
+        "polar": 73.70370370370371
+      },
+      "predictions": {
+        "baseline_a_geometric": 73.1339,
+        "baseline_b_fixed_mean": 73.418802,
+        "qyvoriq_selective": 73.4188
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5698
+    },
+    {
+      "index": 48,
+      "seed": 22074,
+      "condition": "clear",
+      "ground_truth": 43.904587,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 44.53316692515098,
+        "polar": 44.074074074074076
+      },
+      "predictions": {
+        "baseline_a_geometric": 44.533167,
+        "baseline_b_fixed_mean": 44.30362,
+        "qyvoriq_selective": 44.30365
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.4591
+    },
+    {
+      "index": 49,
+      "seed": 22075,
+      "condition": "glare",
+      "ground_truth": 89.391121,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 89.88167076744797,
+        "polar": 89.25925925925927
+      },
+      "predictions": {
+        "baseline_a_geometric": 89.881671,
+        "baseline_b_fixed_mean": 89.570465,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.6224
+    },
+    {
+      "index": 50,
+      "seed": 22076,
+      "condition": "blur",
+      "ground_truth": 87.08963,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 86.49887407679415,
+        "polar": 87.03703703703704
+      },
+      "predictions": {
+        "baseline_a_geometric": 86.498874,
+        "baseline_b_fixed_mean": 86.767956,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5382
+    },
+    {
+      "index": 51,
+      "seed": 22077,
+      "condition": "noise",
+      "ground_truth": 53.28549,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 53.89226380756668,
+        "polar": 53.333333333333336
+      },
+      "predictions": {
+        "baseline_a_geometric": 53.892264,
+        "baseline_b_fixed_mean": 53.612799,
+        "qyvoriq_selective": 53.6128
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5589
+    },
+    {
+      "index": 52,
+      "seed": 22078,
+      "condition": "clear",
+      "ground_truth": 88.573853,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 87.91942303998117,
+        "polar": 88.51851851851852
+      },
+      "predictions": {
+        "baseline_a_geometric": 87.919423,
+        "baseline_b_fixed_mean": 88.218971,
+        "qyvoriq_selective": 88.21895
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5991
+    },
+    {
+      "index": 53,
+      "seed": 22079,
+      "condition": "glare",
+      "ground_truth": 13.275923,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 12.467178303172291,
+        "polar": 12.962962962962962
+      },
+      "predictions": {
+        "baseline_a_geometric": 12.467178,
+        "baseline_b_fixed_mean": 12.715071,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.4958
+    },
+    {
+      "index": 54,
+      "seed": 22080,
+      "condition": "blur",
+      "ground_truth": 34.019571,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 34.6913174633034,
+        "polar": 34.074074074074076
+      },
+      "predictions": {
+        "baseline_a_geometric": 34.691317,
+        "baseline_b_fixed_mean": 34.382696,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.6172
+    },
+    {
+      "index": 55,
+      "seed": 22081,
+      "condition": "noise",
+      "ground_truth": 30.678754,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 30.32642276987474,
+        "polar": 30.74074074074074
+      },
+      "predictions": {
+        "baseline_a_geometric": 30.326423,
+        "baseline_b_fixed_mean": 30.533582,
+        "qyvoriq_selective": 30.53355
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.4143
+    },
+    {
+      "index": 56,
+      "seed": 22082,
+      "condition": "clear",
+      "ground_truth": 82.0004,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 81.3419609525738,
+        "polar": 81.85185185185185
+      },
+      "predictions": {
+        "baseline_a_geometric": 81.341961,
+        "baseline_b_fixed_mean": 81.596906,
+        "qyvoriq_selective": 81.59695
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5099
+    },
+    {
+      "index": 57,
+      "seed": 22083,
+      "condition": "glare",
+      "ground_truth": 90.692161,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 91.20778423119272,
+        "polar": 90.37037037037037
+      },
+      "predictions": {
+        "baseline_a_geometric": 91.207784,
+        "baseline_b_fixed_mean": 90.789077,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.8374
+    },
+    {
+      "index": 58,
+      "seed": 22084,
+      "condition": "blur",
+      "ground_truth": 86.455325,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 85.66614665471431,
+        "polar": 86.29629629629629
+      },
+      "predictions": {
+        "baseline_a_geometric": 85.666147,
+        "baseline_b_fixed_mean": 85.981221,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.6301
+    },
+    {
+      "index": 59,
+      "seed": 22085,
+      "condition": "noise",
+      "ground_truth": 10.610358,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 11.36923941005667,
+        "polar": 10.37037037037037
+      },
+      "predictions": {
+        "baseline_a_geometric": 11.369239,
+        "baseline_b_fixed_mean": 10.869805,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.9989
+    },
+    {
+      "index": 60,
+      "seed": 22086,
+      "condition": "clear",
+      "ground_truth": 84.76704,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 85.29995522277318,
+        "polar": 84.81481481481481
+      },
+      "predictions": {
+        "baseline_a_geometric": 85.299955,
+        "baseline_b_fixed_mean": 85.057385,
+        "qyvoriq_selective": 85.0574
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.4851
+    },
+    {
+      "index": 61,
+      "seed": 22087,
+      "condition": "glare",
+      "ground_truth": 58.418777,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 59.01254687742473,
+        "polar": 58.51851851851851
+      },
+      "predictions": {
+        "baseline_a_geometric": 59.012547,
+        "baseline_b_fixed_mean": 58.765533,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.494
+    },
+    {
+      "index": 62,
+      "seed": 22088,
+      "condition": "blur",
+      "ground_truth": 73.613595,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 73.11462162311348,
+        "polar": 73.70370370370371
+      },
+      "predictions": {
+        "baseline_a_geometric": 73.114622,
+        "baseline_b_fixed_mean": 73.409163,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5891
+    },
+    {
+      "index": 63,
+      "seed": 22089,
+      "condition": "noise",
+      "ground_truth": 72.036118,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 72.43981677157308,
+        "polar": 71.85185185185186
+      },
+      "predictions": {
+        "baseline_a_geometric": 72.439817,
+        "baseline_b_fixed_mean": 72.145834,
+        "qyvoriq_selective": 72.14585
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.588
+    },
+    {
+      "index": 64,
+      "seed": 22090,
+      "condition": "clear",
+      "ground_truth": 8.011903,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 7.3686782721354245,
+        "polar": 7.777777777777778
+      },
+      "predictions": {
+        "baseline_a_geometric": 7.368678,
+        "baseline_b_fixed_mean": 7.573228,
+        "qyvoriq_selective": 7.57325
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.4091
+    },
+    {
+      "index": 65,
+      "seed": 22091,
+      "condition": "glare",
+      "ground_truth": 23.255037,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": false,
+      "raw_estimator_readings": {
+        "geometric": null,
+        "polar": 23.333333333333332
+      },
+      "predictions": {
+        "baseline_a_geometric": null,
+        "baseline_b_fixed_mean": null,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": null
+    },
+    {
+      "index": 66,
+      "seed": 22092,
+      "condition": "blur",
+      "ground_truth": 54.303272,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 55.10297432212137,
+        "polar": 54.44444444444444
+      },
+      "predictions": {
+        "baseline_a_geometric": 55.102974,
+        "baseline_b_fixed_mean": 54.773709,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.6585
+    },
+    {
+      "index": 67,
+      "seed": 22093,
+      "condition": "noise",
+      "ground_truth": 37.483216,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 37.955211778491716,
+        "polar": 37.407407407407405
+      },
+      "predictions": {
+        "baseline_a_geometric": 37.955212,
+        "baseline_b_fixed_mean": 37.68131,
+        "qyvoriq_selective": 37.6813
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5478
+    },
+    {
+      "index": 68,
+      "seed": 22094,
+      "condition": "clear",
+      "ground_truth": 86.761974,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 86.11993349579208,
+        "polar": 86.66666666666667
+      },
+      "predictions": {
+        "baseline_a_geometric": 86.119933,
+        "baseline_b_fixed_mean": 86.3933,
+        "qyvoriq_selective": 86.3933
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5467
+    },
+    {
+      "index": 69,
+      "seed": 22095,
+      "condition": "glare",
+      "ground_truth": 79.7896,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 79.34497868351838,
+        "polar": 80.0
+      },
+      "predictions": {
+        "baseline_a_geometric": 79.344979,
+        "baseline_b_fixed_mean": 79.672489,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.655
+    },
+    {
+      "index": 70,
+      "seed": 22096,
+      "condition": "blur",
+      "ground_truth": 63.883556,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 64.36670147999061,
+        "polar": 63.70370370370371
+      },
+      "predictions": {
+        "baseline_a_geometric": 64.366701,
+        "baseline_b_fixed_mean": 64.035203,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.663
+    },
+    {
+      "index": 71,
+      "seed": 22097,
+      "condition": "noise",
+      "ground_truth": 67.154009,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": false,
+      "raw_estimator_readings": {
+        "geometric": null,
+        "polar": 67.03703703703704
+      },
+      "predictions": {
+        "baseline_a_geometric": null,
+        "baseline_b_fixed_mean": null,
+        "qyvoriq_selective": 66.80975
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": null
+    },
+    {
+      "index": 72,
+      "seed": 22098,
+      "condition": "clear",
+      "ground_truth": 83.691899,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 83.08369003778353,
+        "polar": 83.33333333333334
+      },
+      "predictions": {
+        "baseline_a_geometric": 83.08369,
+        "baseline_b_fixed_mean": 83.208512,
+        "qyvoriq_selective": 83.2085
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.2496
+    },
+    {
+      "index": 73,
+      "seed": 22099,
+      "condition": "glare",
+      "ground_truth": 39.55323,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": false,
+      "raw_estimator_readings": {
+        "geometric": null,
+        "polar": 39.62962962962963
+      },
+      "predictions": {
+        "baseline_a_geometric": null,
+        "baseline_b_fixed_mean": null,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": null
+    },
+    {
+      "index": 74,
+      "seed": 22100,
+      "condition": "blur",
+      "ground_truth": 24.32018,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 25.02564600024758,
+        "polar": 24.444444444444443
+      },
+      "predictions": {
+        "baseline_a_geometric": 25.025646,
+        "baseline_b_fixed_mean": 24.735045,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5812
+    },
+    {
+      "index": 75,
+      "seed": 22101,
+      "condition": "noise",
+      "ground_truth": 60.805654,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 60.258500653886514,
+        "polar": 60.74074074074074
+      },
+      "predictions": {
+        "baseline_a_geometric": 60.258501,
+        "baseline_b_fixed_mean": 60.499621,
+        "qyvoriq_selective": 60.4996
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.4822
+    },
+    {
+      "index": 76,
+      "seed": 22102,
+      "condition": "clear",
+      "ground_truth": 32.90815,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 32.27797238493436,
+        "polar": 32.96296296296296
+      },
+      "predictions": {
+        "baseline_a_geometric": 32.277972,
+        "baseline_b_fixed_mean": 32.620468,
+        "qyvoriq_selective": 32.6205
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.685
+    },
+    {
+      "index": 77,
+      "seed": 22103,
+      "condition": "glare",
+      "ground_truth": 85.348323,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 85.76620893400782,
+        "polar": 85.18518518518519
+      },
+      "predictions": {
+        "baseline_a_geometric": 85.766209,
+        "baseline_b_fixed_mean": 85.475697,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.581
+    },
+    {
+      "index": 78,
+      "seed": 22104,
+      "condition": "blur",
+      "ground_truth": 7.138951,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 6.655236940798891,
+        "polar": 7.037037037037037
+      },
+      "predictions": {
+        "baseline_a_geometric": 6.655237,
+        "baseline_b_fixed_mean": 6.846137,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.3818
+    },
+    {
+      "index": 79,
+      "seed": 22105,
+      "condition": "noise",
+      "ground_truth": 93.502167,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 93.09318500549091,
+        "polar": 93.7037037037037
+      },
+      "predictions": {
+        "baseline_a_geometric": 93.093185,
+        "baseline_b_fixed_mean": 93.398444,
+        "qyvoriq_selective": 93.39845
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.6105
+    },
+    {
+      "index": 80,
+      "seed": 22106,
+      "condition": "clear",
+      "ground_truth": 66.338038,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 65.80795861625795,
+        "polar": 66.2962962962963
+      },
+      "predictions": {
+        "baseline_a_geometric": 65.807959,
+        "baseline_b_fixed_mean": 66.052127,
+        "qyvoriq_selective": 66.05215
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.4883
+    },
+    {
+      "index": 81,
+      "seed": 22107,
+      "condition": "glare",
+      "ground_truth": 48.947706,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": false,
+      "raw_estimator_readings": {
+        "geometric": null,
+        "polar": 48.888888888888886
+      },
+      "predictions": {
+        "baseline_a_geometric": null,
+        "baseline_b_fixed_mean": null,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": null
+    },
+    {
+      "index": 82,
+      "seed": 22108,
+      "condition": "blur",
+      "ground_truth": 60.758439,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 61.27613217642146,
+        "polar": 60.74074074074074
+      },
+      "predictions": {
+        "baseline_a_geometric": 61.276132,
+        "baseline_b_fixed_mean": 61.008436,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5354
+    },
+    {
+      "index": 83,
+      "seed": 22109,
+      "condition": "noise",
+      "ground_truth": 70.260905,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 69.80047708984124,
+        "polar": 70.37037037037037
+      },
+      "predictions": {
+        "baseline_a_geometric": 69.800477,
+        "baseline_b_fixed_mean": 70.085424,
+        "qyvoriq_selective": 70.08545
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5699
+    },
+    {
+      "index": 84,
+      "seed": 22110,
+      "condition": "clear",
+      "ground_truth": 39.313286,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 38.76700516963566,
+        "polar": 39.25925925925926
+      },
+      "predictions": {
+        "baseline_a_geometric": 38.767005,
+        "baseline_b_fixed_mean": 39.013132,
+        "qyvoriq_selective": 39.01315
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.4923
+    },
+    {
+      "index": 85,
+      "seed": 22111,
+      "condition": "glare",
+      "ground_truth": 15.259715,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 14.720814691388926,
+        "polar": 15.185185185185185
+      },
+      "predictions": {
+        "baseline_a_geometric": 14.720815,
+        "baseline_b_fixed_mean": 14.953,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.4644
+    },
+    {
+      "index": 86,
+      "seed": 22112,
+      "condition": "blur",
+      "ground_truth": 24.939295,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 24.168143330844956,
+        "polar": 24.814814814814813
+      },
+      "predictions": {
+        "baseline_a_geometric": 24.168143,
+        "baseline_b_fixed_mean": 24.491479,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.6467
+    },
+    {
+      "index": 87,
+      "seed": 22113,
+      "condition": "noise",
+      "ground_truth": 15.983576,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 16.61503579013815,
+        "polar": 15.925925925925927
+      },
+      "predictions": {
+        "baseline_a_geometric": 16.615036,
+        "baseline_b_fixed_mean": 16.270481,
+        "qyvoriq_selective": 16.27045
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.6891
+    },
+    {
+      "index": 88,
+      "seed": 22114,
+      "condition": "clear",
+      "ground_truth": 10.203618,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 10.79116517706767,
+        "polar": 10.0
+      },
+      "predictions": {
+        "baseline_a_geometric": 10.791165,
+        "baseline_b_fixed_mean": 10.395583,
+        "qyvoriq_selective": 10.3956
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.7912
+    },
+    {
+      "index": 89,
+      "seed": 22115,
+      "condition": "glare",
+      "ground_truth": 51.72553,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 52.24082726655725,
+        "polar": 51.48148148148148
+      },
+      "predictions": {
+        "baseline_a_geometric": 52.240827,
+        "baseline_b_fixed_mean": 51.861154,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.7593
+    },
+    {
+      "index": 90,
+      "seed": 22116,
+      "condition": "blur",
+      "ground_truth": 65.152476,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 65.7298169611712,
+        "polar": 65.18518518518519
+      },
+      "predictions": {
+        "baseline_a_geometric": 65.729817,
+        "baseline_b_fixed_mean": 65.457501,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5446
+    },
+    {
+      "index": 91,
+      "seed": 22117,
+      "condition": "noise",
+      "ground_truth": 30.620685,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 31.331464520708984,
+        "polar": 30.74074074074074
+      },
+      "predictions": {
+        "baseline_a_geometric": 31.331465,
+        "baseline_b_fixed_mean": 31.036103,
+        "qyvoriq_selective": 31.0361
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5907
+    },
+    {
+      "index": 92,
+      "seed": 22118,
+      "condition": "clear",
+      "ground_truth": 75.43452,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 74.83996280089268,
+        "polar": 75.18518518518519
+      },
+      "predictions": {
+        "baseline_a_geometric": 74.839963,
+        "baseline_b_fixed_mean": 75.012574,
+        "qyvoriq_selective": 75.0126
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.3452
+    },
+    {
+      "index": 93,
+      "seed": 22119,
+      "condition": "glare",
+      "ground_truth": 85.208822,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 85.83302769984061,
+        "polar": 85.18518518518519
+      },
+      "predictions": {
+        "baseline_a_geometric": 85.833028,
+        "baseline_b_fixed_mean": 85.509106,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.6478
+    },
+    {
+      "index": 94,
+      "seed": 22120,
+      "condition": "blur",
+      "ground_truth": 63.482108,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 63.96606356623524,
+        "polar": 63.33333333333333
+      },
+      "predictions": {
+        "baseline_a_geometric": 63.966064,
+        "baseline_b_fixed_mean": 63.649698,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.6327
+    },
+    {
+      "index": 95,
+      "seed": 22121,
+      "condition": "noise",
+      "ground_truth": 25.982474,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 25.453714825293805,
+        "polar": 25.925925925925924
+      },
+      "predictions": {
+        "baseline_a_geometric": 25.453715,
+        "baseline_b_fixed_mean": 25.68982,
+        "qyvoriq_selective": 25.6898
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.4722
+    },
+    {
+      "index": 96,
+      "seed": 22122,
+      "condition": "clear",
+      "ground_truth": 32.570708,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 32.01424700408773,
+        "polar": 32.592592592592595
+      },
+      "predictions": {
+        "baseline_a_geometric": 32.014247,
+        "baseline_b_fixed_mean": 32.30342,
+        "qyvoriq_selective": 32.3034
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5783
+    },
+    {
+      "index": 97,
+      "seed": 22123,
+      "condition": "glare",
+      "ground_truth": 13.2928,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 13.845754807669087,
+        "polar": 13.333333333333334
+      },
+      "predictions": {
+        "baseline_a_geometric": 13.845755,
+        "baseline_b_fixed_mean": 13.589544,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5124
+    },
+    {
+      "index": 98,
+      "seed": 22124,
+      "condition": "blur",
+      "ground_truth": 70.676454,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 71.13570160594143,
+        "polar": 70.37037037037037
+      },
+      "predictions": {
+        "baseline_a_geometric": 71.135702,
+        "baseline_b_fixed_mean": 70.753036,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.7653
+    },
+    {
+      "index": 99,
+      "seed": 22125,
+      "condition": "noise",
+      "ground_truth": 31.947296,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 32.442551952843715,
+        "polar": 31.851851851851855
+      },
+      "predictions": {
+        "baseline_a_geometric": 32.442552,
+        "baseline_b_fixed_mean": 32.147202,
+        "qyvoriq_selective": 32.14725
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5907
+    },
+    {
+      "index": 100,
+      "seed": 22126,
+      "condition": "clear",
+      "ground_truth": 30.811728,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 30.302429937619564,
+        "polar": 30.74074074074074
+      },
+      "predictions": {
+        "baseline_a_geometric": 30.30243,
+        "baseline_b_fixed_mean": 30.521585,
+        "qyvoriq_selective": 30.52155
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.4383
+    },
+    {
+      "index": 101,
+      "seed": 22127,
+      "condition": "glare",
+      "ground_truth": 68.114924,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 68.7817011620369,
+        "polar": 68.14814814814815
+      },
+      "predictions": {
+        "baseline_a_geometric": 68.781701,
+        "baseline_b_fixed_mean": 68.464925,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.6336
+    },
+    {
+      "index": 102,
+      "seed": 22128,
+      "condition": "blur",
+      "ground_truth": 8.170175,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 7.593729369171856,
+        "polar": 8.148148148148149
+      },
+      "predictions": {
+        "baseline_a_geometric": 7.593729,
+        "baseline_b_fixed_mean": 7.870939,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5544
+    },
+    {
+      "index": 103,
+      "seed": 22129,
+      "condition": "noise",
+      "ground_truth": 73.408252,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 72.90695870332398,
+        "polar": 73.33333333333333
+      },
+      "predictions": {
+        "baseline_a_geometric": 72.906959,
+        "baseline_b_fixed_mean": 73.120146,
+        "qyvoriq_selective": 73.12015
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.4264
+    },
+    {
+      "index": 104,
+      "seed": 22130,
+      "condition": "clear",
+      "ground_truth": 91.791005,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 91.3439819555292,
+        "polar": 91.85185185185185
+      },
+      "predictions": {
+        "baseline_a_geometric": 91.343982,
+        "baseline_b_fixed_mean": 91.597917,
+        "qyvoriq_selective": 91.59795
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5079
+    },
+    {
+      "index": 105,
+      "seed": 22131,
+      "condition": "glare",
+      "ground_truth": 72.30476,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 71.88568313360219,
+        "polar": 72.5925925925926
+      },
+      "predictions": {
+        "baseline_a_geometric": 71.885683,
+        "baseline_b_fixed_mean": 72.239138,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.7069
+    },
+    {
+      "index": 106,
+      "seed": 22132,
+      "condition": "blur",
+      "ground_truth": 91.519846,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 90.99008946245773,
+        "polar": 91.85185185185185
+      },
+      "predictions": {
+        "baseline_a_geometric": 90.990089,
+        "baseline_b_fixed_mean": 91.420971,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.8618
+    },
+    {
+      "index": 107,
+      "seed": 22133,
+      "condition": "noise",
+      "ground_truth": 47.194025,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 46.49543621924977,
+        "polar": 47.40740740740741
+      },
+      "predictions": {
+        "baseline_a_geometric": 46.495436,
+        "baseline_b_fixed_mean": 46.951422,
+        "qyvoriq_selective": 46.9514
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.912
+    },
+    {
+      "index": 108,
+      "seed": 22134,
+      "condition": "clear",
+      "ground_truth": 71.903332,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 72.38184241372362,
+        "polar": 71.85185185185186
+      },
+      "predictions": {
+        "baseline_a_geometric": 72.381842,
+        "baseline_b_fixed_mean": 72.116847,
+        "qyvoriq_selective": 72.11685
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.53
+    },
+    {
+      "index": 109,
+      "seed": 22135,
+      "condition": "glare",
+      "ground_truth": 49.574435,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": false,
+      "raw_estimator_readings": {
+        "geometric": null,
+        "polar": 50.0
+      },
+      "predictions": {
+        "baseline_a_geometric": null,
+        "baseline_b_fixed_mean": null,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": null
+    },
+    {
+      "index": 110,
+      "seed": 22136,
+      "condition": "blur",
+      "ground_truth": 52.745575,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 52.06421649403461,
+        "polar": 52.59259259259259
+      },
+      "predictions": {
+        "baseline_a_geometric": 52.064216,
+        "baseline_b_fixed_mean": 52.328405,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5284
+    },
+    {
+      "index": 111,
+      "seed": 22137,
+      "condition": "noise",
+      "ground_truth": 27.790938,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 28.24895442344346,
+        "polar": 27.77777777777778
+      },
+      "predictions": {
+        "baseline_a_geometric": 28.248954,
+        "baseline_b_fixed_mean": 28.013366,
+        "qyvoriq_selective": 28.0134
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.4712
+    },
+    {
+      "index": 112,
+      "seed": 22138,
+      "condition": "clear",
+      "ground_truth": 6.661975,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 6.127838711929693,
+        "polar": 6.666666666666667
+      },
+      "predictions": {
+        "baseline_a_geometric": 6.127839,
+        "baseline_b_fixed_mean": 6.397253,
+        "qyvoriq_selective": 6.39725
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.5388
+    },
+    {
+      "index": 113,
+      "seed": 22139,
+      "condition": "glare",
+      "ground_truth": 66.95432,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 67.62190648158645,
+        "polar": 67.03703703703704
+      },
+      "predictions": {
+        "baseline_a_geometric": 67.621906,
+        "baseline_b_fixed_mean": 67.329472,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5849
+    },
+    {
+      "index": 114,
+      "seed": 22140,
+      "condition": "blur",
+      "ground_truth": 38.851136,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 39.47416566999988,
+        "polar": 38.88888888888889
+      },
+      "predictions": {
+        "baseline_a_geometric": 39.474166,
+        "baseline_b_fixed_mean": 39.181527,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5853
+    },
+    {
+      "index": 115,
+      "seed": 22141,
+      "condition": "noise",
+      "ground_truth": 78.306013,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 78.86290907800448,
+        "polar": 78.14814814814814
+      },
+      "predictions": {
+        "baseline_a_geometric": 78.862909,
+        "baseline_b_fixed_mean": 78.505529,
+        "qyvoriq_selective": 78.5055
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.7148
+    },
+    {
+      "index": 116,
+      "seed": 22142,
+      "condition": "clear",
+      "ground_truth": 30.130723,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 30.618617243580893,
+        "polar": 30.0
+      },
+      "predictions": {
+        "baseline_a_geometric": 30.618617,
+        "baseline_b_fixed_mean": 30.309309,
+        "qyvoriq_selective": 30.3093
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.6186
+    },
+    {
+      "index": 117,
+      "seed": 22143,
+      "condition": "glare",
+      "ground_truth": 22.949383,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": false,
+      "raw_estimator_readings": {
+        "geometric": null,
+        "polar": 22.962962962962962
+      },
+      "predictions": {
+        "baseline_a_geometric": null,
+        "baseline_b_fixed_mean": null,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": null
+    },
+    {
+      "index": 118,
+      "seed": 22144,
+      "condition": "blur",
+      "ground_truth": 90.31195,
+      "quality_usable": false,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 90.92997412519341,
+        "polar": 90.37037037037037
+      },
+      "predictions": {
+        "baseline_a_geometric": 90.929974,
+        "baseline_b_fixed_mean": 90.650172,
+        "qyvoriq_selective": null
+      },
+      "state": "REINSPECTION_REQUIRED",
+      "raw_estimator_disagreement_pct_fs": 0.5596
+    },
+    {
+      "index": 119,
+      "seed": 22145,
+      "condition": "noise",
+      "ground_truth": 66.944641,
+      "quality_usable": true,
+      "both_estimators_in_calibration_range": true,
+      "raw_estimator_readings": {
+        "geometric": 66.291118991561,
+        "polar": 67.03703703703704
+      },
+      "predictions": {
+        "baseline_a_geometric": 66.291119,
+        "baseline_b_fixed_mean": 66.664078,
+        "qyvoriq_selective": 66.66405
+      },
+      "state": "VERIFIED",
+      "raw_estimator_disagreement_pct_fs": 0.7459
+    }
+  ],
+  "generated_at": "2026-10-25T10:06:56+00:00"
+}

@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Private, scan-on-push ECR repository for Qyvoriq.
+Resources:
+  QyvoriqRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: qyvoriq
+      ImageTagMutability: IMMUTABLE
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      EncryptionConfiguration:
+        EncryptionType: AES256
+      LifecyclePolicy:
+        LifecyclePolicyText: '{"rules":[{"rulePriority":1,"description":"Expire untagged images after 14 days","selection":{"tagStatus":"untagged","countType":"sinceImagePushed","countUnit":"days","countNumber":14},"action":{"type":"expire"}}]}'
+Outputs:
+  RepositoryUri:
+    Description: Push the ARM64 image here, using an immutable commit tag.
+    Value: !GetAtt QyvoriqRepository.RepositoryUri
+  RepositoryName:
+    Value: !Ref QyvoriqRepository

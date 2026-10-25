@@ -1,0 +1,1 @@
+"""Qyvoriq application package."""
