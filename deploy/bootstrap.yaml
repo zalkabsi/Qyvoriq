@@ -126,6 +126,13 @@ Resources:
                 Effect: Allow
                 Action: [ecs:CreateExpressGatewayService, ecs:DescribeExpressGatewayService, ecs:UpdateExpressGatewayService, ecs:DeleteExpressGatewayService, ecs:DescribeServices]
                 Resource: !Sub arn:${AWS::Partition}:ecs:${AWS::Region}:${AWS::AccountId}:service/qyvoriq-demo/qyvoriq-demo
+              - Sid: ProjectServiceDeploymentReads
+                Effect: Allow
+                Action: [ecs:ListServiceDeployments, ecs:DescribeServiceDeployments, ecs:DescribeServiceRevisions]
+                Resource:
+                  - !Sub arn:${AWS::Partition}:ecs:${AWS::Region}:${AWS::AccountId}:service/qyvoriq-demo/qyvoriq-demo
+                  - !Sub arn:${AWS::Partition}:ecs:${AWS::Region}:${AWS::AccountId}:service-deployment/qyvoriq-demo/qyvoriq-demo/*
+                  - !Sub arn:${AWS::Partition}:ecs:${AWS::Region}:${AWS::AccountId}:service-revision/qyvoriq-demo/qyvoriq-demo/*
               - Sid: ProjectCluster
                 Effect: Allow
                 Action: [ecs:CreateCluster, ecs:DescribeClusters]
