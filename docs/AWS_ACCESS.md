@@ -32,17 +32,23 @@ After deployment, the workflow tests actual health, token protection, clear/glar
 
 ## Judge access and cost
 
-The public web page loads without credentials; processing and results require the shared token. Retrieve the token in **Secrets Manager → qyvoriq/demo/api-token → Retrieve secret value**. Supply it through the competition's private judge instructions. Keep it out of the video, public README, and source.
+The public web page and health routes load without credentials. Uploads, processing, inspection results and benchmark API requests require the shared bearer token. Retrieve it in **Secrets Manager → qyvoriq/demo/api-token → Retrieve secret value** and supply it through the competition's private judge instructions. Keep it out of the video, public README, and source.
 
-Running resources are billed: Fargate, ALB/LCUs, public IPv4, logs, ECR, and Secrets Manager. A small continuously available demo is roughly a few US dollars per day; the exact cost depends on region and traffic. One-task scaling is not a hard billing cap. Set an AWS Budget alert and choose how long the judges need the endpoint before enabling the workflow. Retain access through the published judging window rather than deleting it immediately after recording.
+This is shared-code access, not a verified judge identity check. Anyone who receives the token can use it and access retained inspection records; the app has no individual judge accounts, email allowlist, or per-user record isolation. Give the code only to the owner and judges, and use demonstration images rather than confidential uploads. Strictly limiting access to named people would require an invitation-based authentication layer.
+
+For the default Oregon region (`us-west-2`), plan for approximately **US$2–3 per day**, or **US$30–45 for two weeks**, with one continuously running 1-vCPU/2-GiB x86 task and light judge traffic. This is a planning estimate, not an AWS quote or spending limit. It includes an allowance for Fargate, the ALB and LCUs, public IPv4, logs, ECR, and Secrets Manager. Taxes, credits and account-specific Free Tier eligibility are not assumed; actual network configuration, public addresses and traffic can change the bill.
+
+The task and load balancer incur base charges even when nobody is using the app. One-task scaling bounds steady-state compute capacity but is not a hard billing cap; deployment transitions can temporarily add replacement tasks. AWS Budget alerts send notifications rather than automatically stopping all charges. Choose the judging access period before enabling deployment and retain the endpoint through the published judging window rather than deleting it immediately after recording.
 
 To revoke future deployment access, remove the trust from `qyvoriq-github-deploy` or delete that role after disabling the workflow. To stop application costs after judging, delete the `qyvoriq-demo` CloudFormation stack and check for Express Mode managed resources. The bootstrap's ECR repository is retained deliberately; remove unused images/repository separately if appropriate. An existing shared GitHub OIDC provider is not owned by this project.
 
-## Sources checked on 2026-10-25
+## Sources
+
+Pricing references were rechecked on 2026-10-26; setup references were checked during the 2026-10-25 deployment review.
 
 - [GitHub OIDC with AWS](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws).
 - [AWS ECS Express Mode setup and managed endpoint](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/express-service-getting-started.html).
 - [ECS Express CloudFormation resource](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-ecs-expressgatewayservice.html).
-- [Fargate pricing](https://aws.amazon.com/fargate/pricing/) and [ALB pricing](https://aws.amazon.com/elasticloadbalancing/pricing/).
+- [Fargate pricing](https://aws.amazon.com/fargate/pricing/), [ALB pricing](https://aws.amazon.com/elasticloadbalancing/pricing/), and [public IPv4 pricing](https://aws.amazon.com/vpc/pricing/).
 
 The older `deploy/service.yaml` template remains an advanced ARM64 deployment design with owner-supplied DNS, certificate, and networking. It is not the new judge-demo path. Standard OpenCV is used; COOL is not claimed.

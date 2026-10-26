@@ -35,7 +35,7 @@ Two estimates can share the same bad input or wrong dial geometry, so agreement 
 
 ## What is incomplete
 
-No AWS endpoint is deployed yet; a dedicated GitHub OIDC access bootstrap and ECS Express Mode deployment workflow are prepared and awaiting the account owner's role. Standard OpenCV 5 is used and COOL is not claimed. No real-gauge benchmark or field test was run. A narrated browser-recording pipeline is available; the final live AWS video and its public/unlisted link are still pending. These statuses must be updated from actual deployment and recording evidence before submission.
+No AWS endpoint is deployed yet; a dedicated GitHub OIDC access bootstrap and ECS Express Mode deployment workflow are prepared and awaiting the account owner's role. Standard OpenCV 5 is used and COOL is not claimed. No real-gauge benchmark or field test was run. A 243.2-second narrated local browser preview has been recorded and checked, with captions and sole-creator credits. It is explicitly marked as a local preview. The final live AWS video and its public/unlisted link are still pending. These statuses must be updated from actual deployment and recording evidence before submission.
 
 ## Future work
 
@@ -45,5 +45,5 @@ Evaluate on SyncG with its published held-out split, add licensed real captures 
 
 - Public source repository: `https://github.com/zalkabsi/Qyvoriq` (public access and the `main` tree have been verified).
 - Working AWS endpoint or arranged live screen-share: **not available yet**.
-- Public or unlisted demo video (maximum five minutes): **not recorded yet**.
+- Public or unlisted demo video (maximum five minutes): **final AWS recording and hosted link pending**; a checked 243.2-second local preview exists.
 - Technical report: `docs/TECHNICAL_REPORT.md`.
