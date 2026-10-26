@@ -1,7 +1,7 @@
 {
-  "enabled": false,
+  "enabled": true,
   "region": "us-west-2",
-  "role_arn": "",
+  "role_arn": "arn:aws:iam::855377837445:role/qyvoriq-github-deploy",
   "team": "Zein Alkabsi",
   "bootstrap_stack": "qyvoriq-access"
 }
